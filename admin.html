@@ -31,7 +31,8 @@
             <p class="subtitle">Administração oficial da organização</p>
 
             <nav class="admin-tabs">
-                <button class="tab active" data-section="inscricoes">INSCRIÇÕES</button>
+                <button class="tab active" data-section="dashboard">VISÃO GERAL</button>
+                <button class="tab" data-section="inscricoes">INSCRIÇÕES</button>
                 <button class="tab" data-section="membros">MEMBROS</button>
                 <button class="tab" data-section="lines">LINES</button>
                 <button class="tab" data-section="resultados">RESULTADOS</button>
@@ -41,7 +42,50 @@
                 <button class="tab" data-section="admins">ADMINS</button>
             </nav>
 
-            <section id="inscricoes" class="admin-section active">
+            <section id="dashboard" class="admin-section active">
+                <div class="dashboard-heading">
+                    <div>
+                        <span class="admin-kicker">ROYAL LUXURY • CENTRAL DE COMANDO</span>
+                        <h3>VISÃO GERAL</h3>
+                        <p class="dashboard-intro">Acompanhe os principais números da organização em um só lugar.</p>
+                    </div>
+                    <button type="button" id="refreshDashboard" class="dashboard-refresh">ATUALIZAR DADOS</button>
+                </div>
+
+                <div id="dashboardStats" class="dashboard-stats">
+                    <article class="stat-card"><span>MEMBROS ATIVOS</span><strong>—</strong><small>Carregando...</small></article>
+                    <article class="stat-card"><span>INSCRIÇÕES PENDENTES</span><strong>—</strong><small>Carregando...</small></article>
+                    <article class="stat-card"><span>LINES ATIVAS</span><strong>—</strong><small>Carregando...</small></article>
+                    <article class="stat-card"><span>RESULTADOS PUBLICADOS</span><strong>—</strong><small>Carregando...</small></article>
+                    <article class="stat-card"><span>CAMPEONATOS PUBLICADOS</span><strong>—</strong><small>Carregando...</small></article>
+                    <article class="stat-card"><span>ADVERTÊNCIAS</span><strong>—</strong><small>Carregando...</small></article>
+                </div>
+
+                <div class="dashboard-columns">
+                    <section class="dashboard-panel">
+                        <div class="dashboard-panel-heading">
+                            <h4>ÚLTIMOS RESULTADOS</h4>
+                            <button type="button" data-go-section="resultados">VER TODOS</button>
+                        </div>
+                        <div id="dashboardResults" class="dashboard-feed"><p>Carregando resultados...</p></div>
+                    </section>
+                    <section class="dashboard-panel">
+                        <div class="dashboard-panel-heading">
+                            <h4>INSCRIÇÕES RECENTES</h4>
+                            <button type="button" data-go-section="inscricoes">GERENCIAR</button>
+                        </div>
+                        <div id="dashboardApplications" class="dashboard-feed"><p>Carregando inscrições...</p></div>
+                    </section>
+                </div>
+
+                <div class="dashboard-shortcuts">
+                    <button type="button" data-go-section="membros">＋ CADASTRAR MEMBRO</button>
+                    <button type="button" data-go-section="lines">＋ GERENCIAR LINES</button>
+                    <button type="button" data-go-section="noticias">＋ PUBLICAR NOTÍCIA</button>
+                </div>
+            </section>
+
+            <section id="inscricoes" class="admin-section">
                 <h3>INSCRIÇÕES</h3>
                 <div class="filters">
                     <button data-filter="Pendente">Pendentes</button>
@@ -183,6 +227,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin.js?v=20261116-hierarquia1"></script>
+    <script src="admin.js?v=20261116-dashboard1"></script>
 </body>
 </html>
