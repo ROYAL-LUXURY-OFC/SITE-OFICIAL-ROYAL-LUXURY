@@ -14,27 +14,7 @@ const supabaseClient = window.supabase.createClient(
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-const loginScreen = $("#loginScreen");
-const adminPanel = $("#adminPanel");
-const loginForm = $("#loginForm");
-const loginMessage = $("#loginMessage");
-
 let currentApplicationFilter = "Pendente";
-
-function showMessage(message, error = false) {
-    loginMessage.textContent = message;
-    loginMessage.style.color = error ? "#ff7777" : "#c9a44c";
-}
-
-function showAdminPanel() {
-    loginScreen.hidden = true;
-    adminPanel.hidden = false;
-}
-
-function showLogin() {
-    adminPanel.hidden = true;
-    loginScreen.hidden = false;
-}
 
 function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
@@ -93,77 +73,6 @@ async function verifyAdmin() {
 
     return true;
 }
-
-// LOGIN
-loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const email = $("#email").value.trim();
-    const password = $("#password").value;
-
-    showMessage("Verificando acesso...");
-
-    let signInResult;
-    try {
-        signInResult = await withTimeout(
-            supabaseClient.auth.signInWithPassword({ email, password }),
-            15000
-        );
-    } catch (error) {
-        console.error("Tempo excedido ao autenticar:", error);
-        showMessage("O Supabase não respondeu ao login. Confira a conexão e tente novamente.", true);
-        return;
-    }
-
-    const { error } = signInResult;
-
-    if (error) {
-        showMessage("Não foi possível entrar. Confira o e-mail e a senha.", true);
-        return;
-    }
-
-    try {
-        if (!(await verifyAdmin())) {
-            showMessage("Esta conta não possui permissão de administrador.", true);
-            return;
-        }
-    } catch (error) {
-        console.error("Falha ao verificar administrador:", error);
-        showMessage("A verificação demorou demais ou falhou. Atualize a página e tente novamente.", true);
-        return;
-    }
-
-    showAdminPanel();
-    await loadApplications();
-    await loadMembers();
-});
-
-// RECUPERAÇÃO DE SENHA
-$("#forgotPassword").addEventListener("click", async () => {
-    const email = $("#email").value.trim();
-
-    if (!email) {
-        showMessage("Digite seu e-mail antes de solicitar a recuperação.", true);
-        return;
-    }
-
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.href
-    });
-
-    if (error) {
-        showMessage("Não foi possível enviar o e-mail de recuperação.", true);
-        return;
-    }
-
-    showMessage("Se o e-mail estiver cadastrado, você receberá as instruções.");
-});
-
-// SAIR
-$("#logoutButton").addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
-    showLogin();
-});
 
 // NAVEGAÇÃO DAS ABAS
 $$(".tab").forEach(tab => {
@@ -707,27 +616,25 @@ function loadAdminSection(sectionId) {
     if (sectionId === "advertencias") loadWarnings();
 }
 
-// CARREGAR SESSÃO AO ABRIR A PÁGINA
+console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
+
 async function checkSession() {
     try {
-        if (await verifyAdmin()) {
-            showAdminPanel();
-            await loadApplications();
-            await loadMembers();
-            await loadLines();
-            await loadResults();
-            await loadChampionships();
-            await loadNews();
-            await loadWarnings();
-        } else {
-            showLogin();
+        if (!(await verifyAdmin())) {
+            window.location.replace("login.html");
+            return;
         }
+        await loadApplications();
+        await loadMembers();
+        await loadLines();
+        await loadResults();
+        await loadChampionships();
+        await loadNews();
+        await loadWarnings();
     } catch (error) {
-        console.error("Falha ao restaurar sessão:", error);
-        showLogin();
+        console.error("Falha ao validar acesso ao painel:", error);
+        window.location.replace("login.html");
     }
 }
-
 checkSession();
-
-console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
+console.log("ROYAL LUXURY | Painel administrativo protegido e conectado ao Supabase.");
