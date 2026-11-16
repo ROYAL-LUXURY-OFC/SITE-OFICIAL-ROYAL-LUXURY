@@ -40,6 +40,7 @@
                 <button class="tab" data-section="noticias">NOTÍCIAS</button>
                 <button class="tab" data-section="advertencias">ADVERTÊNCIAS</button>
                 <button class="tab" data-section="admins">ADMINS</button>
+                <button class="tab" data-section="limpar">LIMPAR</button>
             </nav>
 
             <section id="dashboard" class="admin-section active">
@@ -198,6 +199,17 @@
                 </form>
 
                 <div id="warningsList" class="data-list"></div>
+            </section>
+
+            <section id="limpar" class="admin-section">
+                <h3>LIMPEZA DE MEMBROS</h3>
+                <div class="cleanup-panel">
+                    <p>Esta ferramenta remove definitivamente os registros de membros marcados como <strong>INATIVOS</strong>. Os membros ativos, exibidos no site, serão preservados.</p>
+                    <div id="inactiveMembersSummary" class="cleanup-summary">Carregando membros inativos...</div>
+                    <div id="inactiveMembersList" class="data-list"></div>
+                    <button type="button" id="cleanupInactiveMembers" class="cleanup-button">EXCLUIR TODOS OS INATIVOS</button>
+                    <small>Esta ação é permanente e não pode ser desfeita.</small>
+                </div>
             </section>
 
             <section id="admins" class="admin-section">
