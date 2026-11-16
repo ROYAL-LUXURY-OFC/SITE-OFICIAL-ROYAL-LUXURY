@@ -80,7 +80,7 @@ function validateStep() {
 
 function buildReview() {
     const labels = [
-        ["Nick", "nick"], ["ID", "jogador_id"], ["Idade", "idade"],
+        ["Nome real", "nome_real"], ["Nick", "nick"], ["ID", "jogador_id"], ["Idade", "idade"],
         ["Nível", "nivel_conta"], ["WhatsApp", "whatsapp"], ["Cidade", "cidade"],
         ["Patente", "patente"], ["Função", "funcao"],
         ["Line organizada", "line_organizada"], ["Guerras", "disponibilidade_guerras"],
@@ -122,6 +122,7 @@ form.addEventListener("submit", async event => {
 
     const values = Object.fromEntries(new FormData(form).entries());
     const application = {
+        nome_real: values.nome_real.trim(),
         nick: values.nick.trim(),
         jogador_id: values.jogador_id.trim(),
         idade: Number(values.idade),
