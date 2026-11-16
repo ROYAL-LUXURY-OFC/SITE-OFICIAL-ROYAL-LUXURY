@@ -168,7 +168,7 @@ $("#refreshDashboard")?.addEventListener("click", async event => {
     }
 });
 
-$("[data-go-section]").forEach(button => {
+document.querySelectorAll("[data-go-section]").forEach(button => {
     button.addEventListener("click", () => {
         const target = button.dataset.goSection;
         const tab = document.querySelector(`.tab[data-section="${target}"]`);
@@ -177,7 +177,7 @@ $("[data-go-section]").forEach(button => {
 });
 
 // NAVEGAÇÃO DAS ABAS
-$(".tab").forEach(tab => {
+document.querySelectorAll(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
         $$(".tab").forEach(item => item.classList.remove("active"));
         $$(".admin-section").forEach(section => section.classList.remove("active"));
