@@ -697,7 +697,10 @@ console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
 async function checkSession() {
     try {
         if (!(await verifyAdmin())) {
-            window.location.replace("login.html");
+            const panel = $("#adminPanel");
+            if (panel) {
+                panel.innerHTML = '<main style="max-width:680px;margin:12vh auto;padding:32px 24px;text-align:center;background:#111;color:#f2dfb0;border:1px solid #8a6b32;border-radius:12px;font-family:Montserrat,Arial,sans-serif"><h1 style="font-family:Cinzel,Georgia,serif">ROYAL LUXURY</h1><h2>SESSÃO NÃO VALIDADA</h2><p>O painel não conseguiu confirmar seu acesso administrativo. Nenhuma conta foi alterada.</p><a href="login.html?manual=1" style="display:inline-block;margin-top:16px;padding:13px 22px;background:#c9a44c;color:#111;text-decoration:none;font-weight:700;border-radius:6px">VOLTAR AO LOGIN</a></main>';
+            }
             return;
         }
         await loadDashboard();
