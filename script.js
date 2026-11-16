@@ -77,8 +77,11 @@ async function loadPublicMembers() {
         return;
     }
     grid.innerHTML = data.map(member => `
-        <article class="info-card">
-            <span class="card-kicker">ROYAL LUXURY</span>
+        <article class="info-card member-card">
+            <div class="member-card-top">
+                <span class="member-avatar">${safeText(String(member.nick || "RL").trim().slice(0, 2).toUpperCase())}</span>
+                <span class="card-kicker">ROYAL LUXURY</span>
+            </div>
             <h3>${safeText(member.nick)}</h3>
             <p>${safeText(member.nome)}</p>
             <p><strong>Patente:</strong> ${safeText(member.patente || "—")}</p>
@@ -109,7 +112,7 @@ async function loadPublicLines() {
         return;
     }
     grid.innerHTML = data.map(line => `
-        <article class="info-card">
+        <article class="info-card line-card">
             <span class="card-kicker">${safeText(line.sigla || "RLX")}</span>
             <h3>${safeText(line.nome)}</h3>
             <p><strong>Capitão:</strong> ${safeText(line.capitao_nick || "A definir")}</p>
