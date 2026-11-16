@@ -635,6 +635,228 @@ $("#cleanupNonMembers")?.addEventListener("click", async event => {
     }
 });
 
+// RESULTADOS
+async function loadResults() {
+    const box = $("#resultsList");
+    box.innerHTML = "<p>Carregando resultados...</p>";
+    const { data, error } = await supabaseClient.from("resultados_rlx")
+        .select("id,nick,data_guerra,nome_guerra,pontos,abates,colocacao,publicado")
+        .order("data_guerra", { ascending: false });
+    if (error) {
+        box.innerHTML = '<p class="error-message">Erro ao carregar resultados.</p>';
+        console.error(error);
+        return;
+    }
+    if (!data?.length) {
+        box.innerHTML = "<p>Nenhum resultado registrado.</p>";
+        return;
+    }
+    box.innerHTML = data.map(row => `
+        <article class="data-card">
+            <h4>${escapeHTML(row.nick)}</h4>
+            <p><strong>Data:</strong> ${escapeHTML(row.data_guerra)}</p>
+            <p><strong>Guerra:</strong> ${escapeHTML(row.nome_guerra || "-")}</p>
+            <p><strong>Pontos:</strong> ${escapeHTML(row.pontos)}</p>
+            <p><strong>Abates:</strong> ${escapeHTML(row.abates ?? 0)}</p>
+            <p><strong>Colocação:</strong> ${escapeHTML(row.colocacao ?? "-")}</p>
+            <div class="card-actions"><button type="button" data-delete-result="${escapeHTML(row.id)}">EXCLUIR</button></div>
+        </article>`).join("");
+}
+
+$("#resultForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const payload = {
+        nick: $("#resultMember").value.trim(),
+        data_guerra: $("#resultDate").value,
+        pontos: Number($("#resultPoints").value),
+        nome_guerra: $("#resultDescription").value.trim() || null,
+        publicado: true
+    };
+    const { error } = await supabaseClient.from("resultados_rlx").insert(payload);
+    if (error) {
+        alert("Não foi possível registrar o resultado.");
+        console.error(error);
+        return;
+    }
+    event.target.reset();
+    await loadResults();
+});
+
+$("#resultsList").addEventListener("click", async event => {
+    const button = event.target.closest("[data-delete-result]");
+    if (!button || !confirm("Excluir este resultado?")) return;
+    const { error } = await supabaseClient.from("resultados_rlx").delete().eq("id", button.dataset.deleteResult);
+    if (error) alert("Não foi possível excluir o resultado.");
+    else loadResults();
+});
+
+// CAMPEONATOS
+async function loadChampionships() {
+    const box = $("#championshipsList");
+    box.innerHTML = "<p>Carregando campeonatos...</p>";
+    const { data, error } = await supabaseClient.from("campeonatos_rlx")
+        .select("id,nome,descricao,colocacao,data_inicio,data_fim,imagem_url,publicado")
+        .order("criado_em", { ascending: false });
+    if (error) {
+        box.innerHTML = '<p class="error-message">Erro ao carregar campeonatos.</p>';
+        console.error(error);
+        return;
+    }
+    if (!data?.length) {
+        box.innerHTML = "<p>Nenhum campeonato cadastrado.</p>";
+        return;
+    }
+    box.innerHTML = data.map(row => `
+        <article class="data-card">
+            <h4>${escapeHTML(row.nome)}</h4>
+            <p><strong>Colocação:</strong> ${escapeHTML(row.colocacao || "-")}</p>
+            <p>${escapeHTML(row.descricao || "")}</p>
+            <p><strong>Publicado:</strong> ${row.publicado ? "Sim" : "Não"}</p>
+            <div class="card-actions"><button type="button" data-delete-championship="${escapeHTML(row.id)}">EXCLUIR</button></div>
+        </article>`).join("");
+}
+
+$("#championshipForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const payload = {
+        nome: $("#championshipName").value.trim(),
+        colocacao: $("#championshipPlacement").value.trim() || null,
+        descricao: $("#championshipDescription").value.trim() || null,
+        publicado: true
+    };
+    const { error } = await supabaseClient.from("campeonatos_rlx").insert(payload);
+    if (error) {
+        alert("Não foi possível salvar o campeonato.");
+        console.error(error);
+        return;
+    }
+    event.target.reset();
+    await loadChampionships();
+});
+
+$("#championshipsList").addEventListener("click", async event => {
+    const button = event.target.closest("[data-delete-championship]");
+    if (!button || !confirm("Excluir este campeonato?")) return;
+    const { error } = await supabaseClient.from("campeonatos_rlx").delete().eq("id", button.dataset.deleteChampionship);
+    if (error) alert("Não foi possível excluir o campeonato.");
+    else loadChampionships();
+});
+
+// NOTÍCIAS
+async function loadNews() {
+    const box = $("#newsList");
+    box.innerHTML = "<p>Carregando notícias...</p>";
+    const { data, error } = await supabaseClient.from("noticias_rlx")
+        .select("id,titulo,conteudo,imagem_url,publicado,criado_em")
+        .order("criado_em", { ascending: false });
+    if (error) {
+        box.innerHTML = '<p class="error-message">Erro ao carregar notícias.</p>';
+        console.error(error);
+        return;
+    }
+    if (!data?.length) {
+        box.innerHTML = "<p>Nenhuma notícia cadastrada.</p>";
+        return;
+    }
+    box.innerHTML = data.map(row => `
+        <article class="data-card">
+            <h4>${escapeHTML(row.titulo)}</h4>
+            <p>${escapeHTML(row.conteudo || "")}</p>
+            <p><strong>Status:</strong> ${row.publicado ? "Publicada" : "Rascunho"}</p>
+            <div class="card-actions">
+                <button type="button" data-toggle-news="${escapeHTML(row.id)}" data-published="${row.publicado ? "true" : "false"}">${row.publicado ? "TIRAR DO AR" : "PUBLICAR"}</button>
+                <button type="button" data-delete-news="${escapeHTML(row.id)}">EXCLUIR</button>
+            </div>
+        </article>`).join("");
+}
+
+$("#newsForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const payload = {
+        titulo: $("#newsTitle").value.trim(),
+        conteudo: $("#newsContent").value.trim(),
+        imagem_url: $("#newsImage").value.trim() || null,
+        publicado: true
+    };
+    const { error } = await supabaseClient.from("noticias_rlx").insert(payload);
+    if (error) {
+        alert("Não foi possível publicar a notícia.");
+        console.error(error);
+        return;
+    }
+    event.target.reset();
+    await loadNews();
+});
+
+$("#newsList").addEventListener("click", async event => {
+    const toggle = event.target.closest("[data-toggle-news]");
+    const del = event.target.closest("[data-delete-news]");
+    if (toggle) {
+        const published = toggle.dataset.published === "true";
+        const { error } = await supabaseClient.from("noticias_rlx")
+            .update({ publicado: !published }).eq("id", toggle.dataset.toggleNews);
+        if (error) alert("Não foi possível alterar a publicação.");
+        else loadNews();
+    }
+    if (del && confirm("Excluir esta notícia?")) {
+        const { error } = await supabaseClient.from("noticias_rlx").delete().eq("id", del.dataset.deleteNews);
+        if (error) alert("Não foi possível excluir a notícia.");
+        else loadNews();
+    }
+});
+
+// ADVERTÊNCIAS
+async function loadWarnings() {
+    const box = $("#warningsList");
+    box.innerHTML = "<p>Carregando advertências...</p>";
+    const { data, error } = await supabaseClient.from("advertencias_rlx")
+        .select("id,nick,line,motivo,descricao,numero,criado_em")
+        .order("criado_em", { ascending: false });
+    if (error) {
+        box.innerHTML = '<p class="error-message">Erro ao carregar advertências.</p>';
+        console.error(error);
+        return;
+    }
+    if (!data?.length) {
+        box.innerHTML = "<p>Nenhuma advertência registrada.</p>";
+        return;
+    }
+    box.innerHTML = data.map(row => `
+        <article class="data-card">
+            <h4>${escapeHTML(row.nick)}</h4>
+            <p><strong>Motivo:</strong> ${escapeHTML(row.motivo)}</p>
+            <p><strong>Detalhes:</strong> ${escapeHTML(row.descricao || "-")}</p>
+            <p><strong>Número:</strong> ${escapeHTML(row.numero ?? "-")}</p>
+            <p><strong>Data:</strong> ${formatDate(row.criado_em)}</p>
+            <div class="card-actions"><button type="button" data-delete-warning="${escapeHTML(row.id)}">EXCLUIR</button></div>
+        </article>`).join("");
+}
+
+$("#warningForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const payload = {
+        nick: $("#warningMember").value.trim(),
+        motivo: $("#warningReason").value.trim()
+    };
+    const { error } = await supabaseClient.from("advertencias_rlx").insert(payload);
+    if (error) {
+        alert("Não foi possível registrar a advertência.");
+        console.error(error);
+        return;
+    }
+    event.target.reset();
+    await loadWarnings();
+});
+
+$("#warningsList").addEventListener("click", async event => {
+    const button = event.target.closest("[data-delete-warning]");
+    if (!button || !confirm("Excluir esta advertência?")) return;
+    const { error } = await supabaseClient.from("advertencias_rlx").delete().eq("id", button.dataset.deleteWarning);
+    if (error) alert("Não foi possível excluir a advertência.");
+    else loadWarnings();
+});
+
+
 // ADMINISTRADORES E HIERARQUIA
 async function loadAdminsPanel() {
     const identity = $("#adminIdentity");
