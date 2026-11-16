@@ -38,6 +38,7 @@
                 <button class="tab" data-section="campeonatos">CAMPEONATOS</button>
                 <button class="tab" data-section="noticias">NOTÍCIAS</button>
                 <button class="tab" data-section="advertencias">ADVERTÊNCIAS</button>
+                <button class="tab" data-section="admins">ADMINS</button>
             </nav>
 
             <section id="inscricoes" class="admin-section active">
@@ -155,10 +156,21 @@
                 <div id="warningsList" class="data-list"></div>
             </section>
 
+            <section id="admins" class="admin-section">
+                <h3>ADMINISTRADORES</h3>
+                <div id="adminIdentity" class="admin-identity-card">
+                    <p>Carregando informações da conta...</p>
+                </div>
+                <div class="admin-security-note">
+                    <strong>SEGURANÇA DA ROYAL LUXURY</strong>
+                    <p>Esta área identifica a conta administrativa conectada. A inclusão e remoção de administradores é feita pelo Supabase, com autorização protegida, para impedir que usuários comuns concedam acesso a si mesmos.</p>
+                </div>
+            </section>
+
         </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin.js?v=20261116-inscricoes1"></script>
+    <script src="admin.js?v=20261116-motion-admins1"></script>
 </body>
 </html>
