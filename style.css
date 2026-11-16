@@ -963,3 +963,26 @@ body::before {
     }
     .identity-number { width: 35px; text-align: center; }
 }
+
+
+/* EMBLEMA OFICIAL EM DESTAQUE NO HERO */
+.hero-logo {
+    display: block;
+    width: clamp(150px, 21vw, 245px);
+    height: clamp(150px, 21vw, 245px);
+    object-fit: contain;
+    margin: 0 auto 26px;
+    filter: drop-shadow(0 0 22px rgba(198,164,92,.28));
+    animation: emblemReveal 1.2s .12s cubic-bezier(.2,.75,.25,1) both;
+}
+@keyframes emblemReveal {
+    from { opacity: 0; transform: translateY(18px) scale(.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 600px) {
+    .hero-logo {
+        width: 145px;
+        height: 145px;
+        margin-bottom: 20px;
+    }
+}
