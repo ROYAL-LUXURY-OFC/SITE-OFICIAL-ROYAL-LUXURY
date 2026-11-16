@@ -134,7 +134,6 @@ $$(".tab").forEach(tab => {
         const section = document.getElementById(tab.dataset.section);
         if (section) section.classList.add("active");
 
-        if (tab.dataset.section === "inscricoes") loadApplications();
         loadAdminSection(tab.dataset.section);
     });
 });
