@@ -86,7 +86,7 @@ loginForm.addEventListener("submit", async (event) => {
         }
 
         showMessage("Acesso autorizado. Abrindo painel...");
-        window.location.replace("admin.html");
+        window.location.replace("admin.html?build=20261116-fresh-script");
     } catch (error) {
         console.error("Falha na autenticação:", error);
         showMessage(error?.message || "Falha inesperada durante o login.", true);
