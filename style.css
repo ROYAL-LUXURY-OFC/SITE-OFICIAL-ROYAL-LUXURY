@@ -756,3 +756,87 @@ button {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* ========================================
+   MOVIMENTO E PROFUNDIDADE - ROYAL LUXURY
+======================================== */
+html { scroll-padding-top: 90px; }
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: .18;
+    background-image: radial-gradient(rgba(226,194,125,.22) .7px, transparent .7px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+.hero::after {
+    content: "";
+    position: absolute;
+    width: min(70vw, 760px);
+    aspect-ratio: 1;
+    border: 1px solid rgba(198,164,92,.12);
+    border-radius: 50%;
+    box-shadow: 0 0 0 38px rgba(198,164,92,.025), 0 0 0 78px rgba(198,164,92,.018), inset 0 0 90px rgba(198,164,92,.035);
+    animation: royalOrbit 24s linear infinite;
+    pointer-events: none;
+}
+.hero-content { animation: heroEntrance 1.15s cubic-bezier(.2,.75,.25,1) both; }
+.hero-label { animation: softGlow 3.5s ease-in-out infinite; }
+.hero-line { animation: lineReveal 1.2s .45s ease both; }
+.btn-primary, .btn-secondary { position: relative; overflow: hidden; }
+.btn-primary::after, .btn-secondary::after {
+    content: "";
+    position: absolute;
+    inset: -80% auto -80% -45%;
+    width: 28%;
+    transform: rotate(22deg);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+    transition: left .7s ease;
+}
+.btn-primary:hover::after, .btn-secondary:hover::after { left: 130%; }
+.section-heading { position: relative; }
+.section-heading .gold-line { position: relative; overflow: hidden; }
+.section-heading .gold-line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, #fff1c6, transparent);
+    animation: goldSweep 3.8s ease-in-out infinite;
+}
+.info-card { position: relative; overflow: hidden; }
+.info-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: linear-gradient(115deg, transparent 25%, rgba(226,194,125,.07) 50%, transparent 75%);
+    transform: translateX(-100%);
+    transition: opacity .3s ease, transform .8s ease;
+}
+.info-card:hover::after { opacity: 1; transform: translateX(100%); }
+.motion-ready .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .75s ease, transform .75s cubic-bezier(.2,.7,.2,1);
+}
+.motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
+.motion-ready .reveal[data-reveal-delay="1"] { transition-delay: .10s; }
+.motion-ready .reveal[data-reveal-delay="2"] { transition-delay: .20s; }
+.motion-ready .reveal[data-reveal-delay="3"] { transition-delay: .30s; }
+@keyframes heroEntrance {
+    from { opacity: 0; transform: translateY(34px) scale(.985); filter: blur(5px); }
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+@keyframes royalOrbit { to { transform: rotate(360deg); } }
+@keyframes softGlow { 0%,100% { text-shadow: 0 0 0 rgba(198,164,92,0); } 50% { text-shadow: 0 0 16px rgba(198,164,92,.45); } }
+@keyframes lineReveal { from { width: 0; opacity: 0; } to { width: 110px; opacity: 1; } }
+@keyframes goldSweep { 0%,65% { transform: translateX(-110%); } 100% { transform: translateX(110%); } }
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    .motion-ready .reveal { opacity: 1; transform: none; }
+}
