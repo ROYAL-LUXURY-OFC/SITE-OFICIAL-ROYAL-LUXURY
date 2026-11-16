@@ -92,6 +92,7 @@ async function verifyAdmin() {
     }
 
     return true;
+}
 
 // LOGIN
 loginForm.addEventListener("submit", async (event) => {
