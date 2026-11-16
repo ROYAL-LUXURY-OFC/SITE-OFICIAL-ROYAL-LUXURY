@@ -968,11 +968,14 @@ body::before {
 /* EMBLEMA OFICIAL EM DESTAQUE NO HERO */
 .hero-logo {
     display: block;
-    width: clamp(150px, 21vw, 245px);
-    height: clamp(150px, 21vw, 245px);
-    object-fit: contain;
-    margin: 0 auto 26px;
-    filter: drop-shadow(0 0 22px rgba(198,164,92,.28));
+    width: 108px !important;
+    height: 108px !important;
+    max-width: 28vw;
+    object-fit: contain !important;
+    object-position: center;
+    margin: 0 auto 18px;
+    border-radius: 0;
+    filter: drop-shadow(0 0 14px rgba(198,164,92,.24));
     animation: emblemReveal 1.2s .12s cubic-bezier(.2,.75,.25,1) both;
 }
 @keyframes emblemReveal {
@@ -981,8 +984,9 @@ body::before {
 }
 @media (max-width: 600px) {
     .hero-logo {
-        width: 145px;
-        height: 145px;
-        margin-bottom: 20px;
+        width: 82px !important;
+        height: 82px !important;
+        max-width: 24vw;
+        margin-bottom: 14px;
     }
 }
