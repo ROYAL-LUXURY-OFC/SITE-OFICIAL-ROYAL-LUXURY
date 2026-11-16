@@ -696,29 +696,124 @@ $("#warningsList").addEventListener("click", async event => {
     else loadWarnings();
 });
 
-// ADMINISTRADORES: mostra a conta autenticada sem abrir permissões de escrita
-// na tabela admins_rlx pelo navegador.
+// ADMINISTRADORES E HIERARQUIA
 async function loadAdminsPanel() {
-    const box = $("#adminIdentity");
-    if (!box) return;
-    box.innerHTML = "<p>Consultando sessão administrativa...</p>";
+    const identity = $("#adminIdentity");
+    const list = $("#adminsList");
+    if (!identity || !list) return;
 
-    const { data, error } = await supabaseClient.auth.getUser();
-    if (error || !data?.user) {
-        box.innerHTML = '<p class="error-message">Não foi possível identificar a conta conectada.</p>';
-        console.error("Erro ao consultar administrador:", error);
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !userData?.user) {
+        identity.innerHTML = '<p class="error-message">Não foi possível identificar a conta conectada.</p>';
         return;
     }
 
-    const user = data.user;
-    box.innerHTML = `
-        <span class="admin-kicker">SESSÃO AUTENTICADA</span>
-        <h4>♛ ADMINISTRADOR ATIVO</h4>
+    const user = userData.user;
+    const { data: ownRole, error: ownError } = await supabaseClient
+        .from("admins_rlx").select("cargo,nick").eq("user_id", user.id).maybeSingle();
+
+    if (ownError) {
+        identity.innerHTML = '<p class="error-message">Não foi possível consultar seu cargo. Execute a migration SQL da hierarquia no Supabase.</p>';
+        list.innerHTML = "";
+        console.error(ownError);
+        return;
+    }
+
+    const role = ownRole?.cargo || "Administrador";
+    identity.innerHTML = `
+        <span class="admin-kicker">CONTA CONECTADA</span>
+        <h4>${escapeHTML(ownRole?.nick || user.email || "Administrador")}</h4>
         <p><strong>E-mail:</strong> ${escapeHTML(user.email || "Não disponível")}</p>
-        <p><strong>Acesso:</strong> Autorizado pela lista de administradores RLX</p>
-        <span class="admin-active-status">● ACESSO ATIVO</span>
+        <p><strong>Cargo:</strong> ${escapeHTML(role)}</p>
+        <span class="admin-active-status">● ACESSO AUTENTICADO</span>
     `;
+
+    const canManage = ["Líder", "Líder interino"].includes(role);
+    const form = $("#adminManagerForm");
+    if (form) form.style.display = canManage ? "grid" : "none";
+
+    const { data, error } = await supabaseClient.rpc("listar_admins_rlx");
+    if (error) {
+        list.innerHTML = '<p class="error-message">Não foi possível listar a hierarquia. Execute supabase/hierarquia-admins-rlx.sql no SQL Editor do Supabase.</p>';
+        console.error(error);
+        return;
+    }
+
+    if (!data?.length) {
+        list.innerHTML = "<p>Nenhum administrador cadastrado.</p>";
+        return;
+    }
+
+    list.innerHTML = data.map(admin => {
+        const protectedRole = role === "Líder interino" && ["Líder", "Líder interino"].includes(admin.cargo);
+        const isLeader = admin.cargo === "Líder";
+        return `
+            <article class="data-card">
+                <div class="data-card-header">
+                    <h4>${escapeHTML(admin.nick || admin.email)}</h4>
+                    <span>${escapeHTML(admin.cargo)}</span>
+                </div>
+                <p><strong>E-mail:</strong> ${escapeHTML(admin.email)}</p>
+                <div class="card-actions">
+                    ${canManage && !protectedRole && !isLeader ? `<button type="button" data-remove-admin="${escapeHTML(admin.email)}">REMOVER ACESSO</button>` : ""}
+                    ${canManage && !protectedRole && !isLeader ? `<button type="button" data-edit-admin-email="${escapeHTML(admin.email)}" data-edit-admin-nick="${escapeHTML(admin.nick || "")}" data-edit-admin-role="${escapeHTML(admin.cargo)}">EDITAR CARGO</button>` : ""}
+                </div>
+            </article>`;
+    }).join("");
 }
+
+$("#adminManagerForm")?.addEventListener("submit", async event => {
+    event.preventDefault();
+    const email = $("#managedAdminEmail").value.trim();
+    const nick = $("#managedAdminNick").value.trim();
+    const cargo = $("#managedAdminRole").value;
+    const submit = event.submitter || event.target.querySelector("button[type='submit']");
+    if (submit) { submit.disabled = true; submit.textContent = "SALVANDO..."; }
+
+    const { data, error } = await supabaseClient.rpc("gerenciar_admin_rlx", {
+        p_email: email, p_nick: nick, p_cargo: cargo, p_acao: "salvar"
+    });
+
+    if (submit) { submit.disabled = false; submit.textContent = "ADICIONAR / ATUALIZAR CARGO"; }
+    if (error) {
+        alert(error.message || "Não foi possível atualizar o administrador.");
+        console.error(error);
+        return;
+    }
+    alert(data || "Cargo atualizado.");
+    event.target.reset();
+    await loadAdminsPanel();
+});
+
+$("#adminsList")?.addEventListener("click", async event => {
+    const edit = event.target.closest("[data-edit-admin-email]");
+    const remove = event.target.closest("[data-remove-admin]");
+
+    if (edit) {
+        $("#managedAdminEmail").value = edit.dataset.editAdminEmail;
+        $("#managedAdminNick").value = edit.dataset.editAdminNick;
+        $("#managedAdminRole").value = edit.dataset.editAdminRole;
+        $("#adminManagerForm").scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+
+    if (remove) {
+        const email = remove.dataset.removeAdmin;
+        if (!confirm("Remover o acesso administrativo de " + email + "?")) return;
+        remove.disabled = true;
+        const { data, error } = await supabaseClient.rpc("gerenciar_admin_rlx", {
+            p_email: email, p_nick: null, p_cargo: null, p_acao: "remover"
+        });
+        if (error) {
+            alert(error.message || "Não foi possível remover o acesso.");
+            console.error(error);
+            remove.disabled = false;
+            return;
+        }
+        alert(data || "Acesso removido.");
+        await loadAdminsPanel();
+    }
+});
 
 // ATUALIZAÇÃO DE TODAS AS ABAS
 function loadAdminSection(sectionId) {
