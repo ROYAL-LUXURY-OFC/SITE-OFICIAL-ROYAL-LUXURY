@@ -51,16 +51,33 @@ function formatDate(value) {
         : date.toLocaleString("pt-BR");
 }
 
+function withTimeout(promise, milliseconds = 12000) {
+    let timeoutId;
+    const timeout = new Promise((_, reject) => {
+        timeoutId = setTimeout(
+            () => reject(new Error("A verificação do Supabase excedeu o tempo limite.")),
+            milliseconds
+        );
+    });
+
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+}
+
 async function verifyAdmin() {
     const { data: sessionData, error: sessionError } =
-        await supabaseClient.auth.getSession();
+        await withTimeout(supabaseClient.auth.getSession());
 
-    if (sessionError || !sessionData.session) return false;
+    if (sessionError) throw sessionError;
+    if (!sessionData.session) return false;
 
     // A função SECURITY DEFINER verifica auth.uid() na tabela admins_rlx.
-    const { data, error } = await supabaseClient.rpc("is_admin_rlx");
+    const { data, error } = await withTimeout(
+        supabaseClient.rpc("is_admin_rlx")
+    );
 
-    if (error || data !== true) {
+    if (error) throw error;
+
+    if (data !== true) {
         await supabaseClient.auth.signOut();
         return false;
     }
@@ -87,8 +104,14 @@ loginForm.addEventListener("submit", async (event) => {
         return;
     }
 
-    if (!(await verifyAdmin())) {
-        showMessage("Esta conta não possui permissão de administrador.", true);
+    try {
+        if (!(await verifyAdmin())) {
+            showMessage("Esta conta não possui permissão de administrador.", true);
+            return;
+        }
+    } catch (error) {
+        console.error("Falha ao verificar administrador:", error);
+        showMessage("A verificação demorou demais ou falhou. Atualize a página e tente novamente.", true);
         return;
     }
 
@@ -668,16 +691,21 @@ function loadAdminSection(sectionId) {
 
 // CARREGAR SESSÃO AO ABRIR A PÁGINA
 async function checkSession() {
-    if (await verifyAdmin()) {
-        showAdminPanel();
-        await loadApplications();
-        await loadMembers();
-        await loadLines();
-        await loadResults();
-        await loadChampionships();
-        await loadNews();
-        await loadWarnings();
-    } else {
+    try {
+        if (await verifyAdmin()) {
+            showAdminPanel();
+            await loadApplications();
+            await loadMembers();
+            await loadLines();
+            await loadResults();
+            await loadChampionships();
+            await loadNews();
+            await loadWarnings();
+        } else {
+            showLogin();
+        }
+    } catch (error) {
+        console.error("Falha ao restaurar sessão:", error);
         showLogin();
     }
 }
