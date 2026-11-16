@@ -486,7 +486,7 @@ $("#membersList").addEventListener("click", async event => {
 
 // LIMPEZA DE INSCRIÇÕES: mantém quem já está cadastrado como membro no site.
 function normalizeMemberKey(value) {
-    return String(value ?? "").trim().toLocaleLowerCase("pt-BR").replace(/\\s+/g, " ");
+    return String(value ?? "").trim().toLocaleLowerCase("pt-BR").replace(/\s+/g, " ");
 }
 
 $("#cleanupNonMembers")?.addEventListener("click", async event => {
