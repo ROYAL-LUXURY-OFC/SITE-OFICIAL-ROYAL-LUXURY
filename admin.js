@@ -65,17 +65,18 @@ function withTimeout(promise, milliseconds = 12000) {
 }
 
 async function verifyAdmin() {
-    const { data: userData, error: userError } = await withTimeout(
-        supabaseClient.auth.getUser(),
+    // Usa a sessão persistida no navegador para evitar redirecionamentos
+    // causados por uma falha temporária na consulta remota de Auth.
+    const { data: sessionData, error: sessionError } = await withTimeout(
+        supabaseClient.auth.getSession(),
         10000
     );
 
-    if (userError) throw userError;
-    const user = userData?.user;
+    if (sessionError) throw sessionError;
+    const user = sessionData?.session?.user;
     if (!user) return false;
 
-    // Consulta somente o registro do próprio usuário. A tabela admins_rlx
-    // deve permitir que cada administrador leia a própria linha.
+    // Consulta somente o registro do próprio usuário.
     const { data, error } = await withTimeout(
         supabaseClient
             .from("admins_rlx")
@@ -86,13 +87,7 @@ async function verifyAdmin() {
     );
 
     if (error) throw error;
-
-    if (!data) {
-        await supabaseClient.auth.signOut();
-        return false;
-    }
-
-    return true;
+    return Boolean(data);
 }
 
 // DASHBOARD
@@ -715,8 +710,20 @@ async function checkSession() {
         await loadWarnings();
         await loadAdminsPanel();
     } catch (error) {
-        console.error("Falha ao validar acesso ao painel:", error);
-        window.location.replace("login.html");
+        // Não redireciona em falhas temporárias de rede/consulta:
+        // isso evita o ciclo painel -> login -> painel.
+        console.error("Falha ao validar/carregar o painel:", error);
+        const panel = $("#adminPanel");
+        if (panel) {
+            let notice = $("#adminLoadError");
+            if (!notice) {
+                notice = document.createElement("div");
+                notice.id = "adminLoadError";
+                notice.style.cssText = "margin:20px auto;padding:16px;border:1px solid #8a6b32;background:#17130b;color:#f0d58c;max-width:900px;border-radius:8px;";
+                panel.prepend(notice);
+            }
+            notice.innerHTML = "<strong>Não foi possível concluir a verificação do painel.</strong><br> sua sessão foi preservada. Atualize a página ou confira a conexão. Detalhe: " + escapeHTML(error?.message || String(error));
+        }
     }
 }
 checkSession();
