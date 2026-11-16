@@ -7,9 +7,9 @@
     <title>Recrutamento | ROYAL LUXURY</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="recrutamento.css">
+    <link rel="stylesheet" href="recrutamento.css?v=20261116-wizard1">
 </head>
 <body class="recruit-page">
     <header class="recruit-header">
@@ -19,79 +19,115 @@
 
     <main class="recruit-wrap">
         <div class="recruit-heading">
-            <span class="section-subtitle">FAÇA PARTE DA ORGANIZAÇÃO</span>
-            <h1>RECRUTAMENTO <span>RLX</span></h1>
-            <p>Preencha seus dados com atenção. Sua inscrição será analisada pela administração.</p>
+            <span class="section-subtitle">RESPECT. ELEGANCE. DOMINANCE.</span>
+            <h1>FAÇA PARTE DA <span>RLX</span></h1>
+            <p>Mostre seu potencial. Preencha as etapas para entrar na seleção oficial da ROYAL LUXURY.</p>
         </div>
 
-        <form id="recruitmentForm" class="recruit-form">
-            <div class="form-section-title">01 · DADOS DO JOGADOR</div>
-            <label>Nick no Free Fire<input name="nick" maxlength="40" required></label>
-            <label>ID do jogador<input name="jogador_id" inputmode="numeric" maxlength="30" required></label>
-            <div class="form-two">
-                <label>Idade<input name="idade" type="number" min="1" max="99" required></label>
-                <label>Nível da conta<input name="nivel_conta" type="number" min="1" max="999" required></label>
+        <div class="requirements-strip">
+            <div><strong>14+</strong><span>IDADE MÍNIMA</span></div>
+            <div><strong>50</strong><span>NÍVEL MÍNIMO</span></div>
+            <div><strong>DIAMANTE III</strong><span>PATENTE MÍNIMA</span></div>
+        </div>
+
+        <form id="recruitmentForm" class="recruit-form" novalidate>
+            <div class="wizard-progress" aria-label="Progresso do formulário">
+                <div class="progress-track"><span id="progressFill"></span></div>
+                <div class="wizard-steps">
+                    <div class="wizard-step active" data-step-indicator="0"><b>01</b><span>Dados</span></div>
+                    <div class="wizard-step" data-step-indicator="1"><b>02</b><span>Perfil</span></div>
+                    <div class="wizard-step" data-step-indicator="2"><b>03</b><span>Atividade</span></div>
+                    <div class="wizard-step" data-step-indicator="3"><b>04</b><span>Finalizar</span></div>
+                </div>
             </div>
-            <div class="form-two">
+
+            <section class="form-panel active" data-step="0">
+                <div class="form-section-title">01 · QUEM É VOCÊ?</div>
+                <p class="step-description">Comece com suas informações básicas para a administração identificar sua inscrição.</p>
+                <label>Nick no Free Fire<input name="nick" maxlength="40" placeholder="Seu nick dentro do jogo" autocomplete="nickname" required></label>
+                <label>ID do jogador<input name="jogador_id" inputmode="numeric" maxlength="30" placeholder="Seu ID do Free Fire" required></label>
+                <div class="form-two">
+                    <label>Idade<input name="idade" type="number" min="14" max="99" placeholder="Mínimo 14 anos" required></label>
+                    <label>Nível da conta<input name="nivel_conta" type="number" min="50" max="999" placeholder="Mínimo nível 50" required></label>
+                </div>
+                <div class="form-two">
+                    <label>WhatsApp com DDD<input name="whatsapp" type="tel" inputmode="tel" maxlength="20" placeholder="Ex.: 5511999999999" required></label>
+                    <label>Cidade<input name="cidade" maxlength="80" placeholder="Cidade e estado" autocomplete="address-level2" required></label>
+                </div>
+            </section>
+
+            <section class="form-panel" data-step="1">
+                <div class="form-section-title">02 · SEU PERFIL NO JOGO</div>
+                <p class="step-description">Queremos conhecer sua patente e a função em que você mais contribui.</p>
                 <label>Patente atual
                     <select name="patente" required>
-                        <option value="">Selecione</option>
+                        <option value="">Selecione sua patente</option>
                         <option>Bronze</option><option>Prata</option><option>Ouro</option>
-                        <option>Platina</option><option>Diamante</option><option>Mestre</option>
+                        <option>Platina</option><option>Diamante I</option><option>Diamante II</option>
+                        <option>Diamante III</option><option>Diamante IV</option><option>Mestre</option>
                         <option>Elite</option><option>Desafiante</option>
                     </select>
+                    <small class="field-hint">Requisito mínimo: Diamante III.</small>
                 </label>
                 <label>Função principal
                     <select name="funcao" required>
-                        <option value="">Selecione</option>
+                        <option value="">Selecione sua função</option>
                         <option>Rush</option><option>Cura</option><option>Full Gás</option>
                         <option>Coringa</option><option>Capitão</option>
                     </select>
                 </label>
-            </div>
-
-            <div class="form-section-title">02 · CONTATO</div>
-            <div class="form-two">
-                <label>WhatsApp com DDD<input name="whatsapp" type="tel" placeholder="Ex.: 5511999999999" required></label>
-                <label>Cidade<input name="cidade" maxlength="80" required></label>
-            </div>
-
-            <div class="form-section-title">03 · DISPONIBILIDADE E ATIVIDADE</div>
-            <label>Disponibilidade para guerras
-                <select name="disponibilidade_guerras" required>
-                    <option value="">Selecione</option>
-                    <option>Todos os dias</option><option>Durante a semana</option>
-                    <option>Finais de semana</option><option>Horários variáveis</option>
-                </select>
-            </label>
-            <label>Como é sua atividade no jogo?
-                <select name="atividade" required>
-                    <option value="">Selecione</option>
-                    <option>Diariamente</option><option>Quase todos os dias</option>
-                    <option>Algumas vezes por semana</option>
-                </select>
-            </label>
-            <div class="form-two">
-                <label>Acompanha o grupo oficial?
-                    <select name="acompanha_grupo" required>
-                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Não</option>
-                    </select>
-                </label>
                 <label>Tem experiência em line organizada?
                     <select name="line_organizada" required>
-                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Não</option>
+                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Não, mas quero aprender</option>
                     </select>
                 </label>
-            </div>
-            <label>Observações (opcional)<textarea name="observacoes" rows="4" maxlength="600" placeholder="Conte algo que a administração deva saber."></textarea></label>
+            </section>
 
-            <button type="submit" id="submitRecruitment">ENVIAR INSCRIÇÃO</button>
+            <section class="form-panel" data-step="2">
+                <div class="form-section-title">03 · DISPONIBILIDADE E COMPROMISSO</div>
+                <p class="step-description">A organização depende de comunicação e presença. Responda com sinceridade.</p>
+                <label>Disponibilidade para guerras
+                    <select name="disponibilidade_guerras" required>
+                        <option value="">Selecione seus horários</option>
+                        <option>Todos os dias</option><option>Durante a semana</option>
+                        <option>Finais de semana</option><option>Horários variáveis</option>
+                    </select>
+                </label>
+                <label>Como é sua atividade no jogo?
+                    <select name="atividade" required>
+                        <option value="">Selecione</option>
+                        <option>Diariamente</option><option>Quase todos os dias</option>
+                        <option>Algumas vezes por semana</option>
+                    </select>
+                </label>
+                <label>Acompanha o grupo oficial?
+                    <select name="acompanha_grupo" required>
+                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Ainda não</option>
+                    </select>
+                </label>
+                <label>Observações <span class="optional-tag">OPCIONAL</span><textarea name="observacoes" rows="4" maxlength="600" placeholder="Conte sobre sua experiência, seus horários ou algo que a administração deva saber."></textarea></label>
+            </section>
+
+            <section class="form-panel" data-step="3">
+                <div class="form-section-title">04 · REVISE SUA INSCRIÇÃO</div>
+                <p class="step-description">Confira seus dados antes de enviar. A inscrição será encaminhada à administração da RLX.</p>
+                <div id="applicationReview" class="application-review"></div>
+                <label class="consent-check"><input type="checkbox" id="confirmInformation" required><span>Confirmo que as informações preenchidas são verdadeiras.</span></label>
+            </section>
+
+            <div class="wizard-error" id="wizardError" role="alert"></div>
+            <div class="wizard-actions">
+                <button type="button" id="previousStep" class="secondary-button" hidden>VOLTAR</button>
+                <button type="button" id="nextStep" class="primary-button">CONTINUAR <span>→</span></button>
+                <button type="submit" id="submitRecruitment" class="primary-button" hidden>ENVIAR INSCRIÇÃO <span>↗</span></button>
+            </div>
             <p id="recruitmentMessage" role="status" aria-live="polite"></p>
-            <small>Ao enviar, seus dados serão encaminhados à administração da ROYAL LUXURY para análise.</small>
+            <small class="privacy-note">Seus dados serão utilizados somente para análise do recrutamento da ROYAL LUXURY.</small>
         </form>
+        <p class="recruit-footer">ROYAL LUXURY <span>♛</span> RESPECT. ELEGANCE. DOMINANCE.</p>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="recrutamento.js"></script>
+    <script src="recrutamento.js?v=20261116-wizard1"></script>
 </body>
 </html>
