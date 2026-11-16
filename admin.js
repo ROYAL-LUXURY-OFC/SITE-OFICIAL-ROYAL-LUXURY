@@ -94,10 +94,19 @@ loginForm.addEventListener("submit", async (event) => {
 
     showMessage("Verificando acesso...");
 
-    const { error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-    });
+    let signInResult;
+    try {
+        signInResult = await withTimeout(
+            supabaseClient.auth.signInWithPassword({ email, password }),
+            15000
+        );
+    } catch (error) {
+        console.error("Tempo excedido ao autenticar:", error);
+        showMessage("O Supabase não respondeu ao login. Confira a conexão e tente novamente.", true);
+        return;
+    }
+
+    const { error } = signInResult;
 
     if (error) {
         showMessage("Não foi possível entrar. Confira o e-mail e a senha.", true);
