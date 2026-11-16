@@ -484,6 +484,93 @@ $("#membersList").addEventListener("click", async event => {
 });
 
 
+// LIMPEZA: remove somente membros marcados como inativos.
+async function loadInactiveMembers() {
+    const summary = $("#inactiveMembersSummary");
+    const list = $("#inactiveMembersList");
+    const button = $("#cleanupInactiveMembers");
+    if (!summary || !list || !button) return;
+
+    summary.textContent = "Verificando membros inativos...";
+    list.innerHTML = "";
+    button.disabled = true;
+
+    const { data, error } = await supabaseClient
+        .from("membros_rlx")
+        .select("id,nome,nick")
+        .eq("ativo", false)
+        .order("nome", { ascending: true });
+
+    if (error) {
+        summary.textContent = "Não foi possível consultar os membros inativos.";
+        list.innerHTML = '<p class="error-message">Verifique as permissões da tabela membros_rlx.</p>';
+        console.error("Erro ao consultar membros inativos:", error);
+        return;
+    }
+
+    const inactive = data || [];
+    summary.textContent = inactive.length
+        ? inactive.length + (inactive.length === 1 ? " membro inativo encontrado." : " membros inativos encontrados.")
+        : "Nenhum membro inativo encontrado. A lista está limpa.";
+
+    list.innerHTML = inactive.length
+        ? inactive.map(member => `
+            <article class="data-card cleanup-member">
+                <strong>${escapeHTML(member.nick || member.nome || "Membro sem identificação")}</strong>
+                <span>${escapeHTML(member.nome || "")}</span>
+            </article>`).join("")
+        : "";
+
+    button.disabled = inactive.length === 0;
+}
+
+$("#cleanupInactiveMembers")?.addEventListener("click", async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = "LIMPANDO...";
+
+    try {
+        const { data: inactive, error: checkError } = await supabaseClient
+            .from("membros_rlx")
+            .select("id")
+            .eq("ativo", false);
+
+        if (checkError) throw checkError;
+        const ids = (inactive || []).map(member => member.id);
+
+        if (!ids.length) {
+            alert("Não há membros inativos para excluir.");
+            return;
+        }
+
+        const confirmation = confirm(
+            "ATENÇÃO: serão excluídos permanentemente " + ids.length +
+            (ids.length === 1 ? " membro inativo." : " membros inativos.") +
+            "\n\nTodos os membros ativos serão preservados. Deseja continuar?"
+        );
+        if (!confirmation) return;
+
+        const { error: deleteError } = await supabaseClient
+            .from("membros_rlx")
+            .delete()
+            .in("id", ids);
+
+        if (deleteError) throw deleteError;
+
+        alert(ids.length + (ids.length === 1
+            ? " membro inativo foi excluído."
+            : " membros inativos foram excluídos."));
+
+        await Promise.all([loadInactiveMembers(), loadMembers(), loadDashboard()]);
+    } catch (error) {
+        console.error("Erro na limpeza de membros:", error);
+        alert(error.message || "Não foi possível concluir a limpeza. Verifique as permissões e possíveis vínculos desses membros.");
+        await loadInactiveMembers();
+    } finally {
+        button.textContent = "EXCLUIR TODOS OS INATIVOS";
+    }
+});
+
 // LINES
 async function loadLines() {
     const box = $("#linesList");
@@ -909,6 +996,7 @@ function loadAdminSection(sectionId) {
     if (sectionId === "noticias") loadNews();
     if (sectionId === "advertencias") loadWarnings();
     if (sectionId === "admins") loadAdminsPanel();
+    if (sectionId === "limpar") loadInactiveMembers();
 }
 
 console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
