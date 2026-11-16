@@ -228,3 +228,48 @@ loadRoyalLuxurySite();
 
 console.log("ROYAL LUXURY | Site oficial conectado.");
 console.log("RESPECT. ELEGANCE. DOMINANCE.");
+
+
+// ANIMAÇÕES DE ENTRADA AO ROLAR A PÁGINA
+(function initRoyalMotion() {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const targets = ".section-heading, .about-content, .empty-state, .info-card, .recruitment-content, .footer-content";
+    if (reduceMotion || !("IntersectionObserver" in window)) return;
+
+    document.documentElement.classList.add("motion-ready");
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: "0px 0px -35px 0px" });
+
+    function revealWithin(root) {
+        if (root.matches?.(targets) && !root.classList.contains("reveal")) {
+            root.classList.add("reveal");
+            observer.observe(root);
+        }
+        root.querySelectorAll?.(targets).forEach((element, index) => {
+            if (!element.classList.contains("reveal")) {
+                element.classList.add("reveal");
+                if (element.classList.contains("info-card")) {
+                    element.dataset.revealDelay = String((index % 3) + 1);
+                }
+                observer.observe(element);
+            }
+        });
+    }
+
+    revealWithin(document);
+    const mutationObserver = new MutationObserver(records => {
+        records.forEach(record => record.addedNodes.forEach(node => {
+            if (node.nodeType === 1) revealWithin(node);
+        }));
+    });
+    mutationObserver.observe(document.querySelector("main") || document.body, {
+        childList: true,
+        subtree: true
+    });
+})();
