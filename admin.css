@@ -426,3 +426,53 @@ input:focus, select:focus, textarea:focus {
     color: var(--gold-light);
     font-size: 10px;
 }
+
+
+/* ABA DE ADMINISTRADORES */
+.admin-identity-card {
+    padding: 24px;
+    margin-bottom: 18px;
+    background: radial-gradient(circle at top right, rgba(198,164,92,.12), transparent 55%), #101010;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 8px;
+}
+.admin-identity-card h4 {
+    margin: 10px 0 14px;
+    color: var(--gold-light);
+    font-family: "Cinzel", serif;
+    letter-spacing: 1px;
+}
+.admin-identity-card p, .admin-security-note p {
+    color: #aaa;
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+}
+.admin-kicker {
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+.admin-active-status {
+    display: inline-block;
+    margin-top: 15px;
+    color: #9bd49c;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+.admin-security-note {
+    padding: 18px;
+    background: rgba(198,164,92,.045);
+    border: 1px solid rgba(198,164,92,.15);
+    border-radius: 7px;
+}
+.admin-security-note strong {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--gold-light);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+}
