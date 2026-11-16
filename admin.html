@@ -157,13 +157,25 @@
             </section>
 
             <section id="admins" class="admin-section">
-                <h3>ADMINISTRADORES</h3>
+                <h3>HIERARQUIA DA ROYAL LUXURY</h3>
                 <div id="adminIdentity" class="admin-identity-card">
                     <p>Carregando informações da conta...</p>
                 </div>
+                <form id="adminManagerForm" class="admin-form">
+                    <input id="managedAdminEmail" type="email" placeholder="E-mail da conta no Supabase" required>
+                    <input id="managedAdminNick" placeholder="Nick / identificação" required>
+                    <select id="managedAdminRole" required>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Vice-líder">Vice-líder</option>
+                        <option value="Líder interino">Líder interino</option>
+                        <option value="Líder">Líder</option>
+                    </select>
+                    <button type="submit">ADICIONAR / ATUALIZAR CARGO</button>
+                </form>
+                <div id="adminsList" class="data-list"><p>Carregando equipe administrativa...</p></div>
                 <div class="admin-security-note">
-                    <strong>SEGURANÇA DA ROYAL LUXURY</strong>
-                    <p>Esta área identifica a conta administrativa conectada. A inclusão e remoção de administradores é feita pelo Supabase, com autorização protegida, para impedir que usuários comuns concedam acesso a si mesmos.</p>
+                    <strong>PERMISSÕES DE LIDERANÇA</strong>
+                    <p>O líder principal gerencia todos os cargos. O líder interino pode adicionar e gerenciar vice-líderes e administradores, mas não pode alterar os cargos de líder ou líder interino. Ações são validadas no Supabase.</p>
                 </div>
             </section>
 
@@ -171,6 +183,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin.js?v=20261116-motion-admins1"></script>
+    <script src="admin.js?v=20261116-hierarquia1"></script>
 </body>
 </html>
