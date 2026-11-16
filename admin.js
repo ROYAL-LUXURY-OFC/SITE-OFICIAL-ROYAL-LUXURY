@@ -12,7 +12,7 @@ const supabaseClient = window.supabase.createClient(
 );
 
 const $ = (selector) => document.querySelector(selector);
-const $ = (selector) => [...document.querySelectorAll(selector)];
+const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 // BOTÃO SAIR: registrado no início para continuar funcionando mesmo se outra rotina do painel falhar.
 const logoutButton = $("#logoutButton");
