@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090909">
+    <title>Recrutamento | ROYAL LUXURY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="recrutamento.css">
+</head>
+<body class="recruit-page">
+    <header class="recruit-header">
+        <a href="index.html" class="recruit-brand">♛ ROYAL LUXURY</a>
+        <a href="index.html">VOLTAR AO SITE</a>
+    </header>
+
+    <main class="recruit-wrap">
+        <div class="recruit-heading">
+            <span class="section-subtitle">FAÇA PARTE DA ORGANIZAÇÃO</span>
+            <h1>RECRUTAMENTO <span>RLX</span></h1>
+            <p>Preencha seus dados com atenção. Sua inscrição será analisada pela administração.</p>
+        </div>
+
+        <form id="recruitmentForm" class="recruit-form">
+            <div class="form-section-title">01 · DADOS DO JOGADOR</div>
+            <label>Nick no Free Fire<input name="nick" maxlength="40" required></label>
+            <label>ID do jogador<input name="jogador_id" inputmode="numeric" maxlength="30" required></label>
+            <div class="form-two">
+                <label>Idade<input name="idade" type="number" min="1" max="99" required></label>
+                <label>Nível da conta<input name="nivel_conta" type="number" min="1" max="999" required></label>
+            </div>
+            <div class="form-two">
+                <label>Patente atual
+                    <select name="patente" required>
+                        <option value="">Selecione</option>
+                        <option>Bronze</option><option>Prata</option><option>Ouro</option>
+                        <option>Platina</option><option>Diamante</option><option>Mestre</option>
+                        <option>Elite</option><option>Desafiante</option>
+                    </select>
+                </label>
+                <label>Função principal
+                    <select name="funcao" required>
+                        <option value="">Selecione</option>
+                        <option>Rush</option><option>Cura</option><option>Full Gás</option>
+                        <option>Coringa</option><option>Capitão</option>
+                    </select>
+                </label>
+            </div>
+
+            <div class="form-section-title">02 · CONTATO</div>
+            <div class="form-two">
+                <label>WhatsApp com DDD<input name="whatsapp" type="tel" placeholder="Ex.: 5511999999999" required></label>
+                <label>Cidade<input name="cidade" maxlength="80" required></label>
+            </div>
+
+            <div class="form-section-title">03 · DISPONIBILIDADE E ATIVIDADE</div>
+            <label>Disponibilidade para guerras
+                <select name="disponibilidade_guerras" required>
+                    <option value="">Selecione</option>
+                    <option>Todos os dias</option><option>Durante a semana</option>
+                    <option>Finais de semana</option><option>Horários variáveis</option>
+                </select>
+            </label>
+            <label>Como é sua atividade no jogo?
+                <select name="atividade" required>
+                    <option value="">Selecione</option>
+                    <option>Diariamente</option><option>Quase todos os dias</option>
+                    <option>Algumas vezes por semana</option>
+                </select>
+            </label>
+            <div class="form-two">
+                <label>Acompanha o grupo oficial?
+                    <select name="acompanha_grupo" required>
+                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Não</option>
+                    </select>
+                </label>
+                <label>Tem experiência em line organizada?
+                    <select name="line_organizada" required>
+                        <option value="">Selecione</option><option value="true">Sim</option><option value="false">Não</option>
+                    </select>
+                </label>
+            </div>
+            <label>Observações (opcional)<textarea name="observacoes" rows="4" maxlength="600" placeholder="Conte algo que a administração deva saber."></textarea></label>
+
+            <button type="submit" id="submitRecruitment">ENVIAR INSCRIÇÃO</button>
+            <p id="recruitmentMessage" role="status" aria-live="polite"></p>
+            <small>Ao enviar, seus dados serão encaminhados à administração da ROYAL LUXURY para análise.</small>
+        </form>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="recrutamento.js"></script>
+</body>
+</html>
