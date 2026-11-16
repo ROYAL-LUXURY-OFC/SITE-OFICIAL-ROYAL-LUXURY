@@ -484,386 +484,85 @@ $("#membersList").addEventListener("click", async event => {
 });
 
 
-// LIMPEZA: remove somente membros marcados como inativos.
-async function loadInactiveMembers() {
-    const summary = $("#inactiveMembersSummary");
-    const list = $("#inactiveMembersList");
-    const button = $("#cleanupInactiveMembers");
-    if (!summary || !list || !button) return;
-
-    summary.textContent = "Verificando membros inativos...";
-    list.innerHTML = "";
-    button.disabled = true;
-
-    const { data, error } = await supabaseClient
-        .from("membros_rlx")
-        .select("id,nome,nick")
-        .eq("ativo", false)
-        .order("nome", { ascending: true });
-
-    if (error) {
-        summary.textContent = "Não foi possível consultar os membros inativos.";
-        list.innerHTML = '<p class="error-message">Verifique as permissões da tabela membros_rlx.</p>';
-        console.error("Erro ao consultar membros inativos:", error);
-        return;
-    }
-
-    const inactive = data || [];
-    summary.textContent = inactive.length
-        ? inactive.length + (inactive.length === 1 ? " membro inativo encontrado." : " membros inativos encontrados.")
-        : "Nenhum membro inativo encontrado. A lista está limpa.";
-
-    list.innerHTML = inactive.length
-        ? inactive.map(member => `
-            <article class="data-card cleanup-member">
-                <strong>${escapeHTML(member.nick || member.nome || "Membro sem identificação")}</strong>
-                <span>${escapeHTML(member.nome || "")}</span>
-            </article>`).join("")
-        : "";
-
-    button.disabled = inactive.length === 0;
+// LIMPEZA DE INSCRIÇÕES: mantém quem já está cadastrado como membro no site.
+function normalizeMemberKey(value) {
+    return String(value ?? "").trim().toLocaleLowerCase("pt-BR").replace(/\\s+/g, " ");
 }
 
-$("#cleanupInactiveMembers")?.addEventListener("click", async event => {
+$("#cleanupNonMembers")?.addEventListener("click", async event => {
     const button = event.currentTarget;
+    const originalText = button.textContent;
     button.disabled = true;
-    button.textContent = "LIMPANDO...";
+    button.textContent = "VERIFICANDO INSCRIÇÕES...";
 
     try {
-        const { data: inactive, error: checkError } = await supabaseClient
-            .from("membros_rlx")
-            .select("id")
-            .eq("ativo", false);
+        const [{ data: applications, error: applicationsError }, { data: members, error: membersError }] = await Promise.all([
+            supabaseClient.from("inscricoes_rlx").select("id,nick,jogador_id,status"),
+            supabaseClient.from("membros_rlx").select("id_jogo,nick")
+        ]);
 
-        if (checkError) throw checkError;
-        const ids = (inactive || []).map(member => member.id);
+        if (applicationsError) throw applicationsError;
+        if (membersError) throw membersError;
 
-        if (!ids.length) {
-            alert("Não há membros inativos para excluir.");
+        const registeredIds = new Set(
+            (members || []).map(member => normalizeMemberKey(member.id_jogo)).filter(Boolean)
+        );
+        const registeredNicks = new Set(
+            (members || []).map(member => normalizeMemberKey(member.nick)).filter(Boolean)
+        );
+
+        const notOnSite = (applications || []).filter(application => {
+            const gameId = normalizeMemberKey(application.jogador_id);
+            const nick = normalizeMemberKey(application.nick);
+            const existsById = gameId && registeredIds.has(gameId);
+            const existsByNick = nick && registeredNicks.has(nick);
+            return !existsById && !existsByNick;
+        });
+
+        if (!notOnSite.length) {
+            alert("Nenhuma inscrição de jogador fora do site foi encontrada. As inscrições atuais correspondem a membros cadastrados.");
             return;
         }
 
+        const counts = notOnSite.reduce((total, item) => {
+            const status = item.status || "Sem status";
+            total[status] = (total[status] || 0) + 1;
+            return total;
+        }, {});
+        const breakdown = ["Pendente", "Aprovado", "Reprovado"]
+            .filter(status => counts[status])
+            .map(status => counts[status] + " " + status.toLowerCase() + (counts[status] === 1 ? "" : "s"))
+            .join(", ");
+
         const confirmation = confirm(
-            "ATENÇÃO: serão excluídos permanentemente " + ids.length +
-            (ids.length === 1 ? " membro inativo." : " membros inativos.") +
-            "\n\nTodos os membros ativos serão preservados. Deseja continuar?"
+            "Serão excluídas permanentemente " + notOnSite.length +
+            (notOnSite.length === 1 ? " inscrição" : " inscrições") +
+            " de jogadores que não estão cadastrados no site.\n\n" +
+            (breakdown || "Inclui todas as categorias") +
+            "\n\nAs inscrições de jogadores cadastrados como membros serão mantidas. Essa ação não pode ser desfeita.\n\nContinuar?"
         );
         if (!confirmation) return;
 
+        const ids = notOnSite.map(item => item.id);
         const { error: deleteError } = await supabaseClient
-            .from("membros_rlx")
+            .from("inscricoes_rlx")
             .delete()
             .in("id", ids);
 
         if (deleteError) throw deleteError;
 
-        alert(ids.length + (ids.length === 1
-            ? " membro inativo foi excluído."
-            : " membros inativos foram excluídos."));
+        alert(notOnSite.length + (notOnSite.length === 1
+            ? " inscrição foi removida."
+            : " inscrições foram removidas.") + "\n\nAs inscrições de membros cadastrados foram preservadas.");
 
-        await Promise.all([loadInactiveMembers(), loadMembers(), loadDashboard()]);
+        await Promise.all([loadApplications(), loadDashboard()]);
     } catch (error) {
-        console.error("Erro na limpeza de membros:", error);
-        alert(error.message || "Não foi possível concluir a limpeza. Verifique as permissões e possíveis vínculos desses membros.");
-        await loadInactiveMembers();
+        console.error("Erro ao limpar inscrições de jogadores não cadastrados:", error);
+        alert(error.message || "Não foi possível limpar as inscrições. Verifique as permissões da tabela inscricoes_rlx.");
     } finally {
-        button.textContent = "EXCLUIR TODOS OS INATIVOS";
+        button.disabled = false;
+        button.textContent = originalText;
     }
-});
-
-// LINES
-async function loadLines() {
-    const box = $("#linesList");
-    box.innerHTML = "<p>Carregando lines...</p>";
-    const { data, error } = await supabaseClient
-        .from("lines_rlx")
-        .select("id,nome,sigla,capitao_nick,descricao,ativo")
-        .order("nome");
-
-    if (error) {
-        box.innerHTML = '<p class="error-message">Erro ao carregar lines.</p>';
-        console.error(error);
-        return;
-    }
-    if (!data?.length) {
-        box.innerHTML = "<p>Nenhuma line cadastrada.</p>";
-        return;
-    }
-    box.innerHTML = data.map(line => `
-        <article class="data-card">
-            <div class="data-card-header"><h4>${escapeHTML(line.nome)}</h4><span>${line.ativo ? "ATIVA" : "INATIVA"}</span></div>
-            <p><strong>Sigla:</strong> ${escapeHTML(line.sigla || "-")}</p>
-            <p><strong>Capitão:</strong> ${escapeHTML(line.capitao_nick || "-")}</p>
-            <p>${escapeHTML(line.descricao || "")}</p>
-            <div class="card-actions">
-                <button type="button" data-edit-line="${escapeHTML(line.id)}">EDITAR</button>
-                <button type="button" data-delete-line="${escapeHTML(line.id)}">EXCLUIR</button>
-            </div>
-        </article>`).join("");
-}
-
-$("#lineForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const id = $("#lineId").value;
-    const payload = {
-        nome: $("#lineName").value.trim(),
-        capitao_nick: $("#lineLeader").value.trim() || null,
-        descricao: $("#lineDescription").value.trim() || null,
-        ativo: true
-    };
-    const query = id
-        ? supabaseClient.from("lines_rlx").update(payload).eq("id", id)
-        : supabaseClient.from("lines_rlx").insert(payload);
-    const { error } = await query;
-    if (error) {
-        alert("Não foi possível salvar a line.");
-        console.error(error);
-        return;
-    }
-    event.target.reset();
-    $("#lineId").value = "";
-    await loadLines();
-});
-
-$("#linesList").addEventListener("click", async event => {
-    const edit = event.target.closest("[data-edit-line]");
-    const del = event.target.closest("[data-delete-line]");
-    if (edit) {
-        const { data, error } = await supabaseClient.from("lines_rlx")
-            .select("id,nome,capitao_nick,descricao").eq("id", edit.dataset.editLine).single();
-        if (error) return alert("Não foi possível abrir a line.");
-        $("#lineId").value = data.id;
-        $("#lineName").value = data.nome || "";
-        $("#lineLeader").value = data.capitao_nick || "";
-        $("#lineDescription").value = data.descricao || "";
-        $("#lineForm").scrollIntoView({ behavior: "smooth" });
-    }
-    if (del && confirm("Excluir esta line? Os vínculos de membros dessa line também serão removidos.")) {
-        const { error } = await supabaseClient.from("lines_rlx").delete().eq("id", del.dataset.deleteLine);
-        if (error) alert("Não foi possível excluir a line.");
-        else loadLines();
-    }
-});
-
-// RESULTADOS
-async function loadResults() {
-    const box = $("#resultsList");
-    box.innerHTML = "<p>Carregando resultados...</p>";
-    const { data, error } = await supabaseClient.from("resultados_rlx")
-        .select("id,nick,data_guerra,nome_guerra,pontos,abates,colocacao,publicado")
-        .order("data_guerra", { ascending: false });
-    if (error) {
-        box.innerHTML = '<p class="error-message">Erro ao carregar resultados.</p>';
-        console.error(error);
-        return;
-    }
-    if (!data?.length) {
-        box.innerHTML = "<p>Nenhum resultado registrado.</p>";
-        return;
-    }
-    box.innerHTML = data.map(row => `
-        <article class="data-card">
-            <h4>${escapeHTML(row.nick)}</h4>
-            <p><strong>Data:</strong> ${escapeHTML(row.data_guerra)}</p>
-            <p><strong>Guerra:</strong> ${escapeHTML(row.nome_guerra || "-")}</p>
-            <p><strong>Pontos:</strong> ${escapeHTML(row.pontos)}</p>
-            <p><strong>Abates:</strong> ${escapeHTML(row.abates ?? 0)}</p>
-            <p><strong>Colocação:</strong> ${escapeHTML(row.colocacao ?? "-")}</p>
-            <div class="card-actions"><button type="button" data-delete-result="${escapeHTML(row.id)}">EXCLUIR</button></div>
-        </article>`).join("");
-}
-
-$("#resultForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const payload = {
-        nick: $("#resultMember").value.trim(),
-        data_guerra: $("#resultDate").value,
-        pontos: Number($("#resultPoints").value),
-        nome_guerra: $("#resultDescription").value.trim() || null,
-        publicado: true
-    };
-    const { error } = await supabaseClient.from("resultados_rlx").insert(payload);
-    if (error) {
-        alert("Não foi possível registrar o resultado.");
-        console.error(error);
-        return;
-    }
-    event.target.reset();
-    await loadResults();
-});
-
-$("#resultsList").addEventListener("click", async event => {
-    const button = event.target.closest("[data-delete-result]");
-    if (!button || !confirm("Excluir este resultado?")) return;
-    const { error } = await supabaseClient.from("resultados_rlx").delete().eq("id", button.dataset.deleteResult);
-    if (error) alert("Não foi possível excluir o resultado.");
-    else loadResults();
-});
-
-// CAMPEONATOS
-async function loadChampionships() {
-    const box = $("#championshipsList");
-    box.innerHTML = "<p>Carregando campeonatos...</p>";
-    const { data, error } = await supabaseClient.from("campeonatos_rlx")
-        .select("id,nome,descricao,colocacao,data_inicio,data_fim,imagem_url,publicado")
-        .order("criado_em", { ascending: false });
-    if (error) {
-        box.innerHTML = '<p class="error-message">Erro ao carregar campeonatos.</p>';
-        console.error(error);
-        return;
-    }
-    if (!data?.length) {
-        box.innerHTML = "<p>Nenhum campeonato cadastrado.</p>";
-        return;
-    }
-    box.innerHTML = data.map(row => `
-        <article class="data-card">
-            <h4>${escapeHTML(row.nome)}</h4>
-            <p><strong>Colocação:</strong> ${escapeHTML(row.colocacao || "-")}</p>
-            <p>${escapeHTML(row.descricao || "")}</p>
-            <p><strong>Publicado:</strong> ${row.publicado ? "Sim" : "Não"}</p>
-            <div class="card-actions"><button type="button" data-delete-championship="${escapeHTML(row.id)}">EXCLUIR</button></div>
-        </article>`).join("");
-}
-
-$("#championshipForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const payload = {
-        nome: $("#championshipName").value.trim(),
-        colocacao: $("#championshipPlacement").value.trim() || null,
-        descricao: $("#championshipDescription").value.trim() || null,
-        publicado: true
-    };
-    const { error } = await supabaseClient.from("campeonatos_rlx").insert(payload);
-    if (error) {
-        alert("Não foi possível salvar o campeonato.");
-        console.error(error);
-        return;
-    }
-    event.target.reset();
-    await loadChampionships();
-});
-
-$("#championshipsList").addEventListener("click", async event => {
-    const button = event.target.closest("[data-delete-championship]");
-    if (!button || !confirm("Excluir este campeonato?")) return;
-    const { error } = await supabaseClient.from("campeonatos_rlx").delete().eq("id", button.dataset.deleteChampionship);
-    if (error) alert("Não foi possível excluir o campeonato.");
-    else loadChampionships();
-});
-
-// NOTÍCIAS
-async function loadNews() {
-    const box = $("#newsList");
-    box.innerHTML = "<p>Carregando notícias...</p>";
-    const { data, error } = await supabaseClient.from("noticias_rlx")
-        .select("id,titulo,conteudo,imagem_url,publicado,criado_em")
-        .order("criado_em", { ascending: false });
-    if (error) {
-        box.innerHTML = '<p class="error-message">Erro ao carregar notícias.</p>';
-        console.error(error);
-        return;
-    }
-    if (!data?.length) {
-        box.innerHTML = "<p>Nenhuma notícia cadastrada.</p>";
-        return;
-    }
-    box.innerHTML = data.map(row => `
-        <article class="data-card">
-            <h4>${escapeHTML(row.titulo)}</h4>
-            <p>${escapeHTML(row.conteudo || "")}</p>
-            <p><strong>Status:</strong> ${row.publicado ? "Publicada" : "Rascunho"}</p>
-            <div class="card-actions">
-                <button type="button" data-toggle-news="${escapeHTML(row.id)}" data-published="${row.publicado ? "true" : "false"}">${row.publicado ? "TIRAR DO AR" : "PUBLICAR"}</button>
-                <button type="button" data-delete-news="${escapeHTML(row.id)}">EXCLUIR</button>
-            </div>
-        </article>`).join("");
-}
-
-$("#newsForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const payload = {
-        titulo: $("#newsTitle").value.trim(),
-        conteudo: $("#newsContent").value.trim(),
-        imagem_url: $("#newsImage").value.trim() || null,
-        publicado: true
-    };
-    const { error } = await supabaseClient.from("noticias_rlx").insert(payload);
-    if (error) {
-        alert("Não foi possível publicar a notícia.");
-        console.error(error);
-        return;
-    }
-    event.target.reset();
-    await loadNews();
-});
-
-$("#newsList").addEventListener("click", async event => {
-    const toggle = event.target.closest("[data-toggle-news]");
-    const del = event.target.closest("[data-delete-news]");
-    if (toggle) {
-        const published = toggle.dataset.published === "true";
-        const { error } = await supabaseClient.from("noticias_rlx")
-            .update({ publicado: !published }).eq("id", toggle.dataset.toggleNews);
-        if (error) alert("Não foi possível alterar a publicação.");
-        else loadNews();
-    }
-    if (del && confirm("Excluir esta notícia?")) {
-        const { error } = await supabaseClient.from("noticias_rlx").delete().eq("id", del.dataset.deleteNews);
-        if (error) alert("Não foi possível excluir a notícia.");
-        else loadNews();
-    }
-});
-
-// ADVERTÊNCIAS
-async function loadWarnings() {
-    const box = $("#warningsList");
-    box.innerHTML = "<p>Carregando advertências...</p>";
-    const { data, error } = await supabaseClient.from("advertencias_rlx")
-        .select("id,nick,line,motivo,descricao,numero,criado_em")
-        .order("criado_em", { ascending: false });
-    if (error) {
-        box.innerHTML = '<p class="error-message">Erro ao carregar advertências.</p>';
-        console.error(error);
-        return;
-    }
-    if (!data?.length) {
-        box.innerHTML = "<p>Nenhuma advertência registrada.</p>";
-        return;
-    }
-    box.innerHTML = data.map(row => `
-        <article class="data-card">
-            <h4>${escapeHTML(row.nick)}</h4>
-            <p><strong>Motivo:</strong> ${escapeHTML(row.motivo)}</p>
-            <p><strong>Detalhes:</strong> ${escapeHTML(row.descricao || "-")}</p>
-            <p><strong>Número:</strong> ${escapeHTML(row.numero ?? "-")}</p>
-            <p><strong>Data:</strong> ${formatDate(row.criado_em)}</p>
-            <div class="card-actions"><button type="button" data-delete-warning="${escapeHTML(row.id)}">EXCLUIR</button></div>
-        </article>`).join("");
-}
-
-$("#warningForm").addEventListener("submit", async event => {
-    event.preventDefault();
-    const payload = {
-        nick: $("#warningMember").value.trim(),
-        motivo: $("#warningReason").value.trim()
-    };
-    const { error } = await supabaseClient.from("advertencias_rlx").insert(payload);
-    if (error) {
-        alert("Não foi possível registrar a advertência.");
-        console.error(error);
-        return;
-    }
-    event.target.reset();
-    await loadWarnings();
-});
-
-$("#warningsList").addEventListener("click", async event => {
-    const button = event.target.closest("[data-delete-warning]");
-    if (!button || !confirm("Excluir esta advertência?")) return;
-    const { error } = await supabaseClient.from("advertencias_rlx").delete().eq("id", button.dataset.deleteWarning);
-    if (error) alert("Não foi possível excluir a advertência.");
-    else loadWarnings();
 });
 
 // ADMINISTRADORES E HIERARQUIA
@@ -996,7 +695,6 @@ function loadAdminSection(sectionId) {
     if (sectionId === "noticias") loadNews();
     if (sectionId === "advertencias") loadWarnings();
     if (sectionId === "admins") loadAdminsPanel();
-    if (sectionId === "limpar") loadInactiveMembers();
 }
 
 console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
