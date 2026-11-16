@@ -990,3 +990,113 @@ body::before {
         margin-bottom: 14px;
     }
 }
+
+
+/* ========================================
+   FUNDO ROYAL - PROFUNDIDADE E TEXTURA
+======================================== */
+body {
+    background-color: #070707;
+    background-image:
+        radial-gradient(ellipse at 50% 0%, rgba(198,164,92,.075), transparent 42%),
+        linear-gradient(180deg, #090909 0%, #070707 48%, #0a0907 100%);
+    background-attachment: fixed;
+}
+
+.section {
+    overflow: hidden;
+    background-color: #090909;
+}
+
+.section > .container {
+    position: relative;
+    z-index: 1;
+}
+
+.section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: .42;
+    background-image:
+        linear-gradient(rgba(198,164,92,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(198,164,92,.025) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+}
+
+.about {
+    background:
+        radial-gradient(ellipse at 15% 45%, rgba(174,132,57,.105), transparent 38%),
+        radial-gradient(ellipse at 88% 15%, rgba(198,164,92,.055), transparent 32%),
+        linear-gradient(125deg, #11100d 0%, #090909 52%, #100e0a 100%);
+}
+
+.members,
+.results,
+.news {
+    background:
+        radial-gradient(ellipse at 85% 12%, rgba(198,164,92,.075), transparent 34%),
+        radial-gradient(ellipse at 8% 88%, rgba(198,164,92,.045), transparent 30%),
+        linear-gradient(145deg, #0b0b0b 0%, #080808 58%, #0d0b08 100%);
+}
+
+.lines,
+.championships {
+    background:
+        radial-gradient(ellipse at 12% 18%, rgba(198,164,92,.085), transparent 35%),
+        radial-gradient(ellipse at 92% 82%, rgba(198,164,92,.055), transparent 32%),
+        linear-gradient(145deg, #12110e 0%, #0b0b0a 55%, #100e0a 100%);
+}
+
+.recruitment {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(218,180,98,.19), transparent 52%),
+        radial-gradient(ellipse at 50% 100%, rgba(198,164,92,.09), transparent 45%),
+        linear-gradient(135deg, #17130b 0%, #080808 52%, #151108 100%);
+}
+
+.recruitment::before,
+.recruitment::after {
+    content: "";
+    position: absolute;
+    width: 330px;
+    height: 330px;
+    border: 1px solid rgba(198,164,92,.09);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.recruitment::before {
+    top: -230px;
+    left: -145px;
+    box-shadow: 0 0 0 28px rgba(198,164,92,.018), 0 0 0 58px rgba(198,164,92,.012);
+}
+
+.recruitment::after {
+    right: -180px;
+    bottom: -250px;
+    box-shadow: 0 0 0 28px rgba(198,164,92,.018), 0 0 0 58px rgba(198,164,92,.012);
+}
+
+.footer {
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(198,164,92,.085), transparent 55%),
+        linear-gradient(180deg, #090909, #040404);
+    border-top: 1px solid rgba(198,164,92,.14);
+}
+
+@media (max-width: 700px) {
+    body { background-attachment: scroll; }
+    .section::before { background-size: 48px 48px; opacity: .24; }
+    .recruitment::before, .recruitment::after {
+        width: 230px;
+        height: 230px;
+    }
+}
