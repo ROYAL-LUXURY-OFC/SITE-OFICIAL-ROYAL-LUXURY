@@ -696,6 +696,30 @@ $("#warningsList").addEventListener("click", async event => {
     else loadWarnings();
 });
 
+// ADMINISTRADORES: mostra a conta autenticada sem abrir permissões de escrita
+// na tabela admins_rlx pelo navegador.
+async function loadAdminsPanel() {
+    const box = $("#adminIdentity");
+    if (!box) return;
+    box.innerHTML = "<p>Consultando sessão administrativa...</p>";
+
+    const { data, error } = await supabaseClient.auth.getUser();
+    if (error || !data?.user) {
+        box.innerHTML = '<p class="error-message">Não foi possível identificar a conta conectada.</p>';
+        console.error("Erro ao consultar administrador:", error);
+        return;
+    }
+
+    const user = data.user;
+    box.innerHTML = `
+        <span class="admin-kicker">SESSÃO AUTENTICADA</span>
+        <h4>♛ ADMINISTRADOR ATIVO</h4>
+        <p><strong>E-mail:</strong> ${escapeHTML(user.email || "Não disponível")}</p>
+        <p><strong>Acesso:</strong> Autorizado pela lista de administradores RLX</p>
+        <span class="admin-active-status">● ACESSO ATIVO</span>
+    `;
+}
+
 // ATUALIZAÇÃO DE TODAS AS ABAS
 function loadAdminSection(sectionId) {
     if (sectionId === "inscricoes") loadApplications();
@@ -705,6 +729,7 @@ function loadAdminSection(sectionId) {
     if (sectionId === "campeonatos") loadChampionships();
     if (sectionId === "noticias") loadNews();
     if (sectionId === "advertencias") loadWarnings();
+    if (sectionId === "admins") loadAdminsPanel();
 }
 
 console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
@@ -722,6 +747,7 @@ async function checkSession() {
         await loadChampionships();
         await loadNews();
         await loadWarnings();
+        await loadAdminsPanel();
     } catch (error) {
         console.error("Falha ao validar acesso ao painel:", error);
         window.location.replace("login.html");
