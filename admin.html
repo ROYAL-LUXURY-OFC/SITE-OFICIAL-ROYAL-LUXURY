@@ -40,7 +40,6 @@
                 <button class="tab" data-section="noticias">NOTÍCIAS</button>
                 <button class="tab" data-section="advertencias">ADVERTÊNCIAS</button>
                 <button class="tab" data-section="admins">ADMINS</button>
-                <button class="tab" data-section="limpar">LIMPAR</button>
             </nav>
 
             <section id="dashboard" class="admin-section active">
@@ -87,7 +86,11 @@
             </section>
 
             <section id="inscricoes" class="admin-section">
-                <h3>INSCRIÇÕES</h3>
+                <div class="applications-heading">
+                    <h3>INSCRIÇÕES</h3>
+                    <button type="button" id="cleanupNonMembers" class="cleanup-applications-button">LIMPAR INSCRIÇÕES DE QUEM NÃO ESTÁ NO SITE</button>
+                </div>
+                <p class="applications-cleanup-note">Remove inscrições pendentes, aprovadas e reprovadas de jogadores que não estão cadastrados na lista de membros do site. Inscrições de membros cadastrados serão preservadas.</p>
                 <div class="filters">
                     <button data-filter="Pendente">Pendentes</button>
                     <button data-filter="Aprovado">Aprovados</button>
@@ -201,17 +204,6 @@
                 <div id="warningsList" class="data-list"></div>
             </section>
 
-            <section id="limpar" class="admin-section">
-                <h3>LIMPEZA DE MEMBROS</h3>
-                <div class="cleanup-panel">
-                    <p>Esta ferramenta remove definitivamente os registros de membros marcados como <strong>INATIVOS</strong>. Os membros ativos, exibidos no site, serão preservados.</p>
-                    <div id="inactiveMembersSummary" class="cleanup-summary">Carregando membros inativos...</div>
-                    <div id="inactiveMembersList" class="data-list"></div>
-                    <button type="button" id="cleanupInactiveMembers" class="cleanup-button">EXCLUIR TODOS OS INATIVOS</button>
-                    <small>Esta ação é permanente e não pode ser desfeita.</small>
-                </div>
-            </section>
-
             <section id="admins" class="admin-section">
                 <h3>HIERARQUIA DA ROYAL LUXURY</h3>
                 <div id="adminIdentity" class="admin-identity-card">
@@ -239,6 +231,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin.js?v=20261116-limpar1"></script>
+    <script src="admin.js?v=20261116-limpar-inscricoes1"></script>
 </body>
 </html>
