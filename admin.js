@@ -166,37 +166,107 @@ async function loadApplications() {
                 <p><strong>Enviada em:</strong> ${formatDate(item.criado_em)}</p>
             </details>
             <div class="card-actions">
-                <a class="whatsapp-link" href="https://wa.me/${String(item.whatsapp || "").replace(/\D/g, "")}" target="_blank" rel="noopener">ABRIR WHATSAPP</a>
+                <a class="whatsapp-link" href="https://wa.me/${String(item.whatsapp || "").replace(/\D/g, "")}" target="_blank" rel="noopener">CONVERSAR NO WHATSAPP</a>
                 ${item.status === "Pendente" ? `
-                    <button type="button" data-application-status="Aprovado" data-id="${escapeHTML(item.id)}">APROVAR</button>
-                    <button type="button" data-application-status="Reprovado" data-id="${escapeHTML(item.id)}">REPROVAR</button>
+                    <button type="button" class="action-approve" data-application-status="Aprovado" data-id="${escapeHTML(item.id)}">APROVAR</button>
+                    <button type="button" class="action-reject" data-application-status="Reprovado" data-id="${escapeHTML(item.id)}">REPROVAR</button>
                 ` : ""}
+                <button type="button" class="action-register" data-register-application="${escapeHTML(item.id)}">CADASTRAR NO SITE</button>
             </div>
         </article>
     `).join("");
 }
 
 $("#applicationsList").addEventListener("click", async event => {
-    const button = event.target.closest("[data-application-status]");
-    if (!button) return;
+    const statusButton = event.target.closest("[data-application-status]");
+    const registerButton = event.target.closest("[data-register-application]");
 
-    const status = button.dataset.applicationStatus;
-    const id = button.dataset.id;
-    button.disabled = true;
+    if (statusButton) {
+        const status = statusButton.dataset.applicationStatus;
+        const id = statusButton.dataset.id;
+        statusButton.disabled = true;
 
-    const { error } = await supabaseClient
-        .from("inscricoes_rlx")
-        .update({ status })
-        .eq("id", id);
+        const { error } = await supabaseClient
+            .from("inscricoes_rlx")
+            .update({ status })
+            .eq("id", id);
 
-    if (error) {
-        alert("Não foi possível atualizar a inscrição.");
-        console.error(error);
-        button.disabled = false;
+        if (error) {
+            alert("Não foi possível atualizar a inscrição.");
+            console.error(error);
+            statusButton.disabled = false;
+            return;
+        }
+
+        await loadApplications();
         return;
     }
 
-    await loadApplications();
+    if (registerButton) {
+        const id = registerButton.dataset.registerApplication;
+        registerButton.disabled = true;
+        registerButton.textContent = "CADASTRANDO...";
+
+        try {
+            const { data: application, error: applicationError } = await supabaseClient
+                .from("inscricoes_rlx")
+                .select("id,nick,jogador_id,patente,funcao,status")
+                .eq("id", id)
+                .single();
+
+            if (applicationError) throw applicationError;
+
+            const { data: existingMember, error: memberCheckError } = await supabaseClient
+                .from("membros_rlx")
+                .select("id")
+                .eq("id_jogo", application.jogador_id)
+                .maybeSingle();
+
+            if (memberCheckError) throw memberCheckError;
+
+            if (existingMember) {
+                alert("Este jogador já está cadastrado na lista de membros do site.");
+                registerButton.disabled = false;
+                registerButton.textContent = "CADASTRAR NO SITE";
+                return;
+            }
+
+            const { error: insertError } = await supabaseClient
+                .from("membros_rlx")
+                .insert({
+                    nome: application.nick,
+                    nick: application.nick,
+                    id_jogo: application.jogador_id,
+                    patente: application.patente,
+                    funcao: application.funcao,
+                    ativo: true
+                });
+
+            if (insertError) throw insertError;
+
+            if (application.status !== "Aprovado") {
+                const { error: statusError } = await supabaseClient
+                    .from("inscricoes_rlx")
+                    .update({ status: "Aprovado" })
+                    .eq("id", id);
+
+                if (statusError) {
+                    console.error("Membro cadastrado, mas não foi possível atualizar o status da inscrição:", statusError);
+                    alert("Jogador cadastrado no site, mas não foi possível atualizar o status da inscrição.");
+                    await loadApplications();
+                    return;
+                }
+            }
+
+            alert("Jogador cadastrado no site e inscrição marcada como aprovada!");
+            await loadApplications();
+        } catch (error) {
+            console.error("Erro ao cadastrar jogador no site:", error);
+            alert("Não foi possível cadastrar. Confira as permissões e os campos da tabela membros_rlx.");
+            registerButton.disabled = false;
+            registerButton.textContent = "CADASTRAR NO SITE";
+        }
+    }
 });
 
 // MEMBROS
