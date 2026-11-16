@@ -12,7 +12,28 @@ const supabaseClient = window.supabase.createClient(
 );
 
 const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => [...document.querySelectorAll(selector)];
+const $ = (selector) => [...document.querySelectorAll(selector)];
+
+// BOTÃO SAIR: registrado no início para continuar funcionando mesmo se outra rotina do painel falhar.
+const logoutButton = $("#logoutButton");
+if (logoutButton) {
+    logoutButton.addEventListener("click", async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        logoutButton.disabled = true;
+        logoutButton.textContent = "SAINDO...";
+        try {
+            const { error } = await supabaseClient.auth.signOut({ scope: "global" });
+            if (error) throw error;
+            window.location.href = "login.html?signedout=1";
+        } catch (error) {
+            console.error("Erro ao encerrar sessão:", error);
+            alert("Não foi possível encerrar a sessão. Confira a conexão e tente novamente.");
+            logoutButton.disabled = false;
+            logoutButton.textContent = "SAIR";
+        }
+    });
+}
 
 let currentApplicationFilter = "Pendente";
 
@@ -617,25 +638,6 @@ function loadAdminSection(sectionId) {
 }
 
 console.log("ROYAL LUXURY | Painel administrativo conectado ao Supabase.");
-
-// BOTÃO SAIR: encerra a sessão e retorna à página exclusiva de login.
-const logoutButton = $("#logoutButton");
-if (logoutButton) {
-    logoutButton.addEventListener("click", async () => {
-        logoutButton.disabled = true;
-        logoutButton.textContent = "SAINDO...";
-        try {
-            const { error } = await withTimeout(supabaseClient.auth.signOut(), 10000);
-            if (error) throw error;
-            window.location.replace("login.html?signedout=1");
-        } catch (error) {
-            console.error("Erro ao encerrar sessão:", error);
-            alert("Não foi possível sair. Verifique sua conexão e tente novamente.");
-            logoutButton.disabled = false;
-            logoutButton.textContent = "SAIR";
-        }
-    });
-}
 
 async function checkSession() {
     try {
