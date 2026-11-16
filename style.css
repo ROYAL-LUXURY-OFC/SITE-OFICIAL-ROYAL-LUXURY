@@ -1,0 +1,694 @@
+
+/* ========================================
+   ROYAL LUXURY - IDENTIDADE VISUAL OFICIAL
+   Preto, dourado e elegância
+======================================== */
+
+:root {
+    --black: #090909;
+    --black-light: #111111;
+    --black-card: #151515;
+    --gold: #c6a45c;
+    --gold-light: #ead39a;
+    --gold-dark: #80652f;
+    --white: #f5f3ed;
+    --gray: #a5a5a5;
+    --border: rgba(198, 164, 92, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Montserrat', sans-serif;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font-family: inherit;
+}
+
+.container {
+    width: min(1200px, 90%);
+    margin: auto;
+}
+
+/* ========================================
+   CABEÇALHO
+======================================== */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 85px;
+    z-index: 1000;
+    background: rgba(8, 8, 8, 0.94);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border);
+}
+
+.nav-container {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 49px;
+    height: 49px;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.brand-text strong {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+}
+
+.brand-text span {
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--gray);
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 23px;
+}
+
+.navigation a {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #d0d0d0;
+    transition: 0.3s;
+}
+
+.navigation a:hover {
+    color: var(--gold-light);
+}
+
+.navigation .nav-button {
+    padding: 12px 17px;
+    border: 1px solid var(--gold);
+    color: var(--gold-light);
+}
+
+.navigation .nav-button:hover {
+    background: var(--gold);
+    color: var(--black);
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--gold-light);
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* ========================================
+   HERO
+======================================== */
+
+.hero {
+    min-height: 750px;
+    height: 100vh;
+    max-height: 950px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+
+    background:
+        radial-gradient(ellipse at center, rgba(110, 82, 35, 0.19), transparent 55%),
+        linear-gradient(135deg, #111 0%, #050505 65%, #17120a 100%);
+}
+
+.hero::before {
+    content: "RLX";
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-size: clamp(200px, 35vw, 490px);
+    font-weight: 800;
+    color: rgba(198, 164, 92, 0.035);
+    letter-spacing: 15px;
+    pointer-events: none;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, transparent, rgba(0,0,0,0.2), transparent),
+        linear-gradient(0deg, #090909, transparent 25%, transparent 80%, #090909);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 100px 20px 40px;
+    animation: fadeUp 1s ease;
+}
+
+.hero-label {
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 5px;
+    font-weight: 600;
+}
+
+.hero h1 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(45px, 8vw, 100px);
+    line-height: 1.2;
+    margin: 25px 0 15px;
+    letter-spacing: 5px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.hero h1 span {
+    display: block;
+    color: var(--gold-light);
+    text-shadow: 0 0 35px rgba(198, 164, 92, 0.18);
+}
+
+.hero-line {
+    width: 110px;
+    height: 2px;
+    margin: 25px auto;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.hero-content > p {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    letter-spacing: 5px;
+    color: var(--gold-light);
+}
+
+.hero-description {
+    display: block;
+    margin-top: 18px;
+    color: #aaa;
+    font-size: 13px;
+    letter-spacing: 1px;
+}
+
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+    min-height: 48px;
+    padding: 15px 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    transition: 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #e5cc8c, #aa843c);
+    color: #100e09;
+    border: 1px solid var(--gold-light);
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(198, 164, 92, 0.2);
+}
+
+.btn-secondary {
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    background: rgba(0,0,0,0.3);
+}
+
+.btn-secondary:hover {
+    background: rgba(198,164,92,0.12);
+    transform: translateY(-4px);
+}
+
+.hero-bottom {
+    position: absolute;
+    bottom: 35px;
+    left: 5%;
+    right: 5%;
+    display: flex;
+    justify-content: space-between;
+    color: var(--gold-dark);
+    font-size: 10px;
+    letter-spacing: 3px;
+}
+
+/* ========================================
+   SEÇÕES
+======================================== */
+
+.section {
+    padding: 110px 0;
+    position: relative;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-subtitle {
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 4px;
+    font-weight: 700;
+}
+
+.section-heading h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(26px, 4vw, 43px);
+    margin-top: 15px;
+    letter-spacing: 2px;
+}
+
+.section-heading h2 span {
+    color: var(--gold-light);
+}
+
+.gold-line {
+    width: 65px;
+    height: 2px;
+    background: var(--gold);
+    margin: 22px auto;
+}
+
+.section-heading > p {
+    color: var(--gray);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* ========================================
+   SOBRE
+======================================== */
+
+.about {
+    background: #0e0e0e;
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    align-items: center;
+    gap: 80px;
+}
+
+.about-emblem {
+    min-height: 310px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, rgba(198,164,92,0.09), transparent 70%);
+}
+
+.about-emblem img {
+    width: min(280px, 85%);
+    max-height: 300px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 30px rgba(198,164,92,0.12));
+}
+
+.about-text h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 23px;
+    color: var(--gold-light);
+    margin-bottom: 25px;
+}
+
+.about-text p {
+    color: #aaa;
+    font-size: 13px;
+    line-height: 2;
+    margin-bottom: 18px;
+}
+
+.about-motto {
+    display: inline-block;
+    margin-top: 15px;
+    padding-left: 15px;
+    border-left: 2px solid var(--gold);
+    color: var(--gold);
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* ========================================
+   MEMBROS E LINES
+======================================== */
+
+.members,
+.results,
+.news {
+    background: #090909;
+}
+
+.lines,
+.championships {
+    background: #101010;
+}
+
+.empty-state {
+    min-height: 230px;
+    padding: 45px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(145deg, #151515, #101010);
+    border: 1px solid var(--border);
+    transition: 0.3s;
+}
+
+.empty-state:hover {
+    border-color: rgba(198,164,92,0.55);
+    transform: translateY(-4px);
+}
+
+.empty-icon {
+    font-size: 35px;
+    color: var(--gold);
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 12px;
+    color: var(--gray);
+    line-height: 1.8;
+}
+
+/* ========================================
+   RECRUTAMENTO
+======================================== */
+
+.recruitment {
+    padding: 120px 20px;
+    text-align: center;
+    background:
+        radial-gradient(ellipse at center, rgba(139,105,45,0.16), transparent 65%),
+        linear-gradient(120deg, #15120c, #080808 70%);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+.recruitment-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.recruitment h2 {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(27px, 5vw, 48px);
+    margin: 22px 0;
+}
+
+.recruitment h2 span {
+    color: var(--gold-light);
+}
+
+.recruitment p {
+    color: #aaa;
+    font-size: 13px;
+    line-height: 1.9;
+    max-width: 600px;
+    margin-bottom: 30px;
+}
+
+.recruitment small {
+    color: var(--gold-dark);
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-top: 20px;
+}
+
+/* ========================================
+   RODAPÉ
+======================================== */
+
+.footer {
+    background: #050505;
+    padding: 65px 20px 35px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.footer-logo {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+    margin-bottom: 18px;
+}
+
+.footer h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 25px;
+    letter-spacing: 3px;
+}
+
+.footer h2 span {
+    color: var(--gold-light);
+}
+
+.footer-content > p {
+    color: var(--gold-dark);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-top: 12px;
+}
+
+.footer-divider {
+    width: 100%;
+    max-width: 350px;
+    height: 1px;
+    background: var(--border);
+    margin: 35px 0;
+}
+
+.copyright {
+    color: #777;
+    font-size: 9px;
+    letter-spacing: 1px;
+}
+
+.footer-tag {
+    color: var(--gold-dark);
+    font-size: 9px;
+    letter-spacing: 2px;
+    margin-top: 15px;
+}
+
+/* ========================================
+   ANIMAÇÕES
+======================================== */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   RESPONSIVIDADE
+======================================== */
+
+@media (max-width: 1050px) {
+    .navigation {
+        gap: 13px;
+    }
+
+    .navigation a {
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 850px) {
+    .header {
+        height: 75px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .navigation {
+        position: absolute;
+        top: 75px;
+        left: 0;
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        background: rgba(8,8,8,0.98);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 5% 20px;
+    }
+
+    .navigation.active {
+        display: flex;
+    }
+
+    .navigation a {
+        padding: 15px 5px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 11px;
+    }
+
+    .navigation .nav-button {
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    .hero {
+        min-height: 680px;
+    }
+
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .about-emblem {
+        min-height: 220px;
+    }
+
+    .about-emblem img {
+        width: 210px;
+        max-height: 220px;
+    }
+
+    .about-text {
+        text-align: center;
+    }
+
+    .about-motto {
+        border-left: none;
+        border-bottom: 2px solid var(--gold);
+        padding: 0 0 10px;
+    }
+
+    .section {
+        padding: 85px 0;
+    }
+}
+
+@media (max-width: 500px) {
+    .brand-text strong {
+        font-size: 14px;
+    }
+
+    .brand-text span {
+        font-size: 7px;
+    }
+
+    .logo {
+        width: 42px;
+        height: 42px;
+    }
+
+    .hero-label {
+        font-size: 8px;
+        letter-spacing: 3px;
+    }
+
+    .hero h1 {
+        letter-spacing: 2px;
+    }
+
+    .hero-content > p {
+        font-size: 10px;
+        letter-spacing: 3px;
+    }
+
+    .hero-description {
+        font-size: 11px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-buttons a {
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .hero-bottom {
+        font-size: 8px;
+    }
+
+    .recruitment {
+        padding: 85px 15px;
+    }
+}
