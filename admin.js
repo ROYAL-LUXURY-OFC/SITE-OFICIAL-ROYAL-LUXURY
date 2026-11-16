@@ -479,6 +479,81 @@ $("#membersList").addEventListener("click", async event => {
 });
 
 
+// LINES
+async function loadLines() {
+    const box = $("#linesList");
+    box.innerHTML = "<p>Carregando lines...</p>";
+    const { data, error } = await supabaseClient
+        .from("lines_rlx")
+        .select("id,nome,sigla,capitao_nick,descricao,ativo")
+        .order("nome");
+
+    if (error) {
+        box.innerHTML = '<p class="error-message">Erro ao carregar lines.</p>';
+        console.error(error);
+        return;
+    }
+    if (!data?.length) {
+        box.innerHTML = "<p>Nenhuma line cadastrada.</p>";
+        return;
+    }
+    box.innerHTML = data.map(line => `
+        <article class="data-card">
+            <div class="data-card-header"><h4>${escapeHTML(line.nome)}</h4><span>${line.ativo ? "ATIVA" : "INATIVA"}</span></div>
+            <p><strong>Sigla:</strong> ${escapeHTML(line.sigla || "-")}</p>
+            <p><strong>Capitão:</strong> ${escapeHTML(line.capitao_nick || "-")}</p>
+            <p>${escapeHTML(line.descricao || "")}</p>
+            <div class="card-actions">
+                <button type="button" data-edit-line="${escapeHTML(line.id)}">EDITAR</button>
+                <button type="button" data-delete-line="${escapeHTML(line.id)}">EXCLUIR</button>
+            </div>
+        </article>`).join("");
+}
+
+$("#lineForm").addEventListener("submit", async event => {
+    event.preventDefault();
+    const id = $("#lineId").value;
+    const payload = {
+        nome: $("#lineName").value.trim(),
+        capitao_nick: $("#lineLeader").value.trim() || null,
+        descricao: $("#lineDescription").value.trim() || null,
+        ativo: true
+    };
+    const query = id
+        ? supabaseClient.from("lines_rlx").update(payload).eq("id", id)
+        : supabaseClient.from("lines_rlx").insert(payload);
+    const { error } = await query;
+    if (error) {
+        alert("Não foi possível salvar a line.");
+        console.error(error);
+        return;
+    }
+    event.target.reset();
+    $("#lineId").value = "";
+    await loadLines();
+});
+
+$("#linesList").addEventListener("click", async event => {
+    const edit = event.target.closest("[data-edit-line]");
+    const del = event.target.closest("[data-delete-line]");
+    if (edit) {
+        const { data, error } = await supabaseClient.from("lines_rlx")
+            .select("id,nome,capitao_nick,descricao").eq("id", edit.dataset.editLine).single();
+        if (error) return alert("Não foi possível abrir a line.");
+        $("#lineId").value = data.id;
+        $("#lineName").value = data.nome || "";
+        $("#lineLeader").value = data.capitao_nick || "";
+        $("#lineDescription").value = data.descricao || "";
+        $("#lineForm").scrollIntoView({ behavior: "smooth" });
+    }
+    if (del && confirm("Excluir esta line? Os vínculos de membros dessa line também serão removidos.")) {
+        const { error } = await supabaseClient.from("lines_rlx").delete().eq("id", del.dataset.deleteLine);
+        if (error) alert("Não foi possível excluir a line.");
+        else loadLines();
+    }
+});
+
+
 // LIMPEZA DE INSCRIÇÕES: mantém quem já está cadastrado como membro no site.
 function normalizeMemberKey(value) {
     return String(value ?? "").trim().toLocaleLowerCase("pt-BR").replace(/\s+/g, " ");
