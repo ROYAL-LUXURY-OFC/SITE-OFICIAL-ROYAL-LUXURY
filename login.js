@@ -47,7 +47,7 @@ loginForm.addEventListener("submit", async (event) => {
     try {
         const { error } = await withTimeout(supabaseClient.auth.signInWithPassword({ email, password }), 15000);
         if (error) {
-            showMessage("Não foi possível entrar. Confira o e-mail e a senha.", true);
+            showMessage(error.message || "Não foi possível entrar. Confira o e-mail e a senha.", true);
             return;
         }
         if (!(await verifyAdmin())) {
