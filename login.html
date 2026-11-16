@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Administrativo | ROYAL LUXURY</title>
+<link rel="stylesheet" href="admin.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <h1>ROYAL LUXURY</h1>
+    <p>ACESSO ADMINISTRATIVO</p>
+    <form id="loginForm">
+      <label for="email">E-mail</label>
+      <input type="email" id="email" placeholder="Seu e-mail" autocomplete="username" required>
+      <label for="password">Senha</label>
+      <input type="password" id="password" placeholder="Sua senha" autocomplete="current-password" required>
+      <button type="submit">ENTRAR</button>
+      <button type="button" id="forgotPassword" class="forgot">Esqueci minha senha</button>
+      <p id="loginMessage" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="login.js?v=20261116-split1"></script>
+</body>
+</html>
