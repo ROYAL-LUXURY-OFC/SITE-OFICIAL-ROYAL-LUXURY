@@ -1,0 +1,188 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Administração | ROYAL LUXURY</title>
+
+    <link rel="stylesheet" href="admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div id="loginScreen" class="login-screen">
+        <div class="login-card">
+            <h1>ROYAL LUXURY</h1>
+            <p>PAINEL ADMINISTRATIVO</p>
+
+            <form id="loginForm">
+                <label>E-mail</label>
+                <input type="email" id="email" placeholder="Seu e-mail" required>
+
+                <label>Senha</label>
+                <input type="password" id="password" placeholder="Sua senha" required>
+
+                <button type="submit">ENTRAR</button>
+
+                <button type="button" id="forgotPassword" class="forgot">
+                    Esqueci minha senha
+                </button>
+
+                <p id="loginMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminPanel" class="admin-panel" hidden>
+
+        <header class="admin-header">
+            <div>
+                <h1>ROYAL LUXURY</h1>
+                <span>PAINEL DE CONTROLE</span>
+            </div>
+
+            <button id="logoutButton">SAIR</button>
+        </header>
+
+        <main class="admin-content">
+
+            <h2>GERENCIAMENTO</h2>
+            <p class="subtitle">Administração oficial da organização</p>
+
+            <nav class="admin-tabs">
+                <button class="tab active" data-section="inscricoes">INSCRIÇÕES</button>
+                <button class="tab" data-section="membros">MEMBROS</button>
+                <button class="tab" data-section="lines">LINES</button>
+                <button class="tab" data-section="resultados">RESULTADOS</button>
+                <button class="tab" data-section="campeonatos">CAMPEONATOS</button>
+                <button class="tab" data-section="noticias">NOTÍCIAS</button>
+                <button class="tab" data-section="advertencias">ADVERTÊNCIAS</button>
+            </nav>
+
+            <section id="inscricoes" class="admin-section active">
+                <h3>INSCRIÇÕES</h3>
+                <div class="filters">
+                    <button data-filter="Pendente">Pendentes</button>
+                    <button data-filter="Aprovado">Aprovados</button>
+                    <button data-filter="Reprovado">Reprovados</button>
+                </div>
+                <div id="applicationsList" class="data-list">
+                    <p>Carregando inscrições...</p>
+                </div>
+            </section>
+
+            <section id="membros" class="admin-section">
+                <h3>MEMBROS</h3>
+
+                <form id="memberForm" class="admin-form">
+                    <input type="hidden" id="memberId">
+
+                    <input id="memberName" placeholder="Nome do jogador" required>
+                    <input id="memberNick" placeholder="Nick no Free Fire" required>
+                    <input id="memberGameId" placeholder="ID do jogador">
+
+                    <select id="memberRank" required>
+                        <option value="">Selecione a patente</option>
+                        <option>Bronze</option>
+                        <option>Prata</option>
+                        <option>Ouro</option>
+                        <option>Platina</option>
+                        <option>Diamante</option>
+                        <option>Mestre</option>
+                        <option>Elite</option>
+                        <option>Desafiante</option>
+                    </select>
+
+                    <select id="memberFunction" required>
+                        <option value="">Selecione a função</option>
+                        <option>Rush</option>
+                        <option>Cura</option>
+                        <option>Full Gás</option>
+                        <option>Coringa</option>
+                        <option>Capitão</option>
+                    </select>
+
+                    <button type="submit">SALVAR MEMBRO</button>
+                </form>
+
+                <div id="membersList" class="data-list"></div>
+            </section>
+
+            <section id="lines" class="admin-section">
+                <h3>LINES</h3>
+
+                <form id="lineForm" class="admin-form">
+                    <input type="hidden" id="lineId">
+                    <input id="lineName" placeholder="Nome da line" required>
+                    <input id="lineLeader" placeholder="Capitão da line">
+                    <textarea id="lineDescription" placeholder="Descrição da line"></textarea>
+                    <button type="submit">SALVAR LINE</button>
+                </form>
+
+                <div id="linesList" class="data-list"></div>
+            </section>
+
+            <section id="resultados" class="admin-section">
+                <h3>RESULTADOS</h3>
+
+                <form id="resultForm" class="admin-form">
+                    <input id="resultMember" placeholder="Nick do jogador" required>
+                    <input id="resultDate" type="date" required>
+                    <input id="resultPoints" type="number" placeholder="Pontos" required>
+                    <input id="resultDescription" placeholder="Descrição da partida">
+                    <button type="submit">REGISTRAR RESULTADO</button>
+                </form>
+
+                <div id="resultsList" class="data-list"></div>
+            </section>
+
+            <section id="campeonatos" class="admin-section">
+                <h3>CAMPEONATOS</h3>
+
+                <form id="championshipForm" class="admin-form">
+                    <input id="championshipName" placeholder="Nome do campeonato" required>
+                    <input id="championshipPlacement" placeholder="Colocação atual">
+                    <textarea id="championshipDescription" placeholder="Informações do campeonato"></textarea>
+                    <button type="submit">SALVAR CAMPEONATO</button>
+                </form>
+
+                <div id="championshipsList" class="data-list"></div>
+            </section>
+
+            <section id="noticias" class="admin-section">
+                <h3>NOTÍCIAS</h3>
+
+                <form id="newsForm" class="admin-form">
+                    <input id="newsTitle" placeholder="Título da notícia" required>
+                    <textarea id="newsContent" placeholder="Conteúdo da notícia" required></textarea>
+                    <input id="newsImage" placeholder="Link da imagem (opcional)">
+                    <button type="submit">PUBLICAR NOTÍCIA</button>
+                </form>
+
+                <div id="newsList" class="data-list"></div>
+            </section>
+
+            <section id="advertencias" class="admin-section">
+                <h3>ADVERTÊNCIAS</h3>
+
+                <form id="warningForm" class="admin-form">
+                    <input id="warningMember" placeholder="Nick do jogador" required>
+                    <input id="warningReason" placeholder="Motivo da advertência" required>
+                    <button type="submit">REGISTRAR ADVERTÊNCIA</button>
+                </form>
+
+                <div id="warningsList" class="data-list"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="admin.js"></script>
+
+</body>
+</html>
