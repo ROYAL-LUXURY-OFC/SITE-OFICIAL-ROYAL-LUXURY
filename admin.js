@@ -95,8 +95,89 @@ async function verifyAdmin() {
     return true;
 }
 
+// DASHBOARD
+async function loadDashboard() {
+    const statsBox = $("#dashboardStats");
+    const resultsBox = $("#dashboardResults");
+    const applicationsBox = $("#dashboardApplications");
+    if (!statsBox || !resultsBox || !applicationsBox) return;
+
+    statsBox.querySelectorAll(".stat-card strong").forEach(value => value.textContent = "…");
+    const countQueries = [
+        supabaseClient.from("membros_rlx").select("id", { count: "exact", head: true }).eq("ativo", true),
+        supabaseClient.from("inscricoes_rlx").select("id", { count: "exact", head: true }).eq("status", "Pendente"),
+        supabaseClient.from("lines_rlx").select("id", { count: "exact", head: true }).eq("ativo", true),
+        supabaseClient.from("resultados_rlx").select("id", { count: "exact", head: true }).eq("publicado", true),
+        supabaseClient.from("campeonatos_rlx").select("id", { count: "exact", head: true }).eq("publicado", true),
+        supabaseClient.from("advertencias_rlx").select("id", { count: "exact", head: true })
+    ];
+
+    const [members, applications, lines, results, championships, warnings, recentResults, recentApplications] = await Promise.all([
+        ...countQueries,
+        supabaseClient.from("resultados_rlx").select("nick,data_guerra,pontos,nome_guerra").eq("publicado", true).order("data_guerra", { ascending: false }).limit(4),
+        supabaseClient.from("inscricoes_rlx").select("nick,status,criado_em").order("criado_em", { ascending: false }).limit(4)
+    ]);
+
+    const values = [members, applications, lines, results, championships, warnings];
+    const labels = ["Membros ativos", "Inscrições aguardando análise", "Lines ativas", "Resultados publicados", "Campeonatos publicados", "Registros totais"];
+    statsBox.innerHTML = values.map((item, index) => {
+        const failed = Boolean(item.error);
+        if (failed) console.error("Erro ao carregar indicador do dashboard:", item.error);
+        return `
+            <article class="stat-card">
+                <span>${labels[index].toUpperCase()}</span>
+                <strong>${failed ? "—" : Number(item.count ?? 0).toLocaleString("pt-BR")}</strong>
+                <small>${failed ? "Não foi possível carregar" : (index === 1 && item.count > 0 ? "Precisam de avaliação" : "Dados atualizados")}</small>
+            </article>`;
+    }).join("");
+
+    if (recentResults.error) {
+        resultsBox.innerHTML = '<p class="dashboard-error">Não foi possível carregar os resultados.</p>';
+    } else if (!recentResults.data?.length) {
+        resultsBox.innerHTML = "<p>Nenhum resultado publicado ainda.</p>";
+    } else {
+        resultsBox.innerHTML = recentResults.data.map(row => `
+            <article class="dashboard-feed-item">
+                <strong>${escapeHTML(row.nick || "Jogador")} • ${escapeHTML(row.pontos ?? 0)} pontos</strong>
+                <span>${escapeHTML(row.nome_guerra || "Guerra") } · ${escapeHTML(row.data_guerra || "Data não informada")}</span>
+            </article>`).join("");
+    }
+
+    if (recentApplications.error) {
+        applicationsBox.innerHTML = '<p class="dashboard-error">Não foi possível carregar as inscrições.</p>';
+    } else if (!recentApplications.data?.length) {
+        applicationsBox.innerHTML = "<p>Nenhuma inscrição recebida ainda.</p>";
+    } else {
+        applicationsBox.innerHTML = recentApplications.data.map(row => `
+            <article class="dashboard-feed-item">
+                <strong>${escapeHTML(row.nick || "Candidato")}</strong>
+                <span>${escapeHTML(row.status || "Sem status")} · ${formatDate(row.criado_em)}</span>
+            </article>`).join("");
+    }
+}
+
+$("#refreshDashboard")?.addEventListener("click", async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    button.textContent = "ATUALIZANDO...";
+    try {
+        await loadDashboard();
+    } finally {
+        button.disabled = false;
+        button.textContent = "ATUALIZAR DADOS";
+    }
+});
+
+$("[data-go-section]").forEach(button => {
+    button.addEventListener("click", () => {
+        const target = button.dataset.goSection;
+        const tab = document.querySelector(`.tab[data-section="${target}"]`);
+        if (tab) tab.click();
+    });
+});
+
 // NAVEGAÇÃO DAS ABAS
-$$(".tab").forEach(tab => {
+$(".tab").forEach(tab => {
     tab.addEventListener("click", () => {
         $$(".tab").forEach(item => item.classList.remove("active"));
         $$(".admin-section").forEach(section => section.classList.remove("active"));
@@ -817,6 +898,7 @@ $("#adminsList")?.addEventListener("click", async event => {
 
 // ATUALIZAÇÃO DE TODAS AS ABAS
 function loadAdminSection(sectionId) {
+    if (sectionId === "dashboard") loadDashboard();
     if (sectionId === "inscricoes") loadApplications();
     if (sectionId === "membros") loadMembers();
     if (sectionId === "lines") loadLines();
@@ -835,6 +917,7 @@ async function checkSession() {
             window.location.replace("login.html");
             return;
         }
+        await loadDashboard();
         await loadApplications();
         await loadMembers();
         await loadLines();
