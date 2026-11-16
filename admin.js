@@ -227,9 +227,11 @@ async function loadApplications() {
     container.innerHTML = data.map(item => `
         <article class="data-card application-card">
             <div class="data-card-header">
-                <h4>${escapeHTML(item.nick)}</h4>
+                <h4>${escapeHTML(item.nome_real || item.nick)}</h4>
+                <p><strong>Nick no jogo:</strong> ${escapeHTML(item.nick)}</p>
                 <span class="status ${escapeHTML(item.status.toLowerCase())}">${escapeHTML(item.status)}</span>
             </div>
+            <p><strong>Nome real:</strong> ${escapeHTML(item.nome_real || "Não informado")}</p>
             <p><strong>ID:</strong> ${escapeHTML(item.jogador_id)}</p>
             <p><strong>Idade:</strong> ${escapeHTML(item.idade)}</p>
             <p><strong>Patente:</strong> ${escapeHTML(item.patente)}</p>
@@ -291,7 +293,7 @@ $("#applicationsList").addEventListener("click", async event => {
         try {
             const { data: application, error: applicationError } = await supabaseClient
                 .from("inscricoes_rlx")
-                .select("id,nick,jogador_id,patente,funcao,status")
+                .select("id,nome_real,nick,jogador_id,patente,funcao,status")
                 .eq("id", id)
                 .single();
 
@@ -315,7 +317,7 @@ $("#applicationsList").addEventListener("click", async event => {
             const { error: insertError } = await supabaseClient
                 .from("membros_rlx")
                 .insert({
-                    nome: application.nick,
+                    nome: application.nome_real || application.nick,
                     nick: application.nick,
                     id_jogo: application.jogador_id,
                     patente: application.patente,
