@@ -35,23 +35,8 @@ async function verifyAdmin(user) {
     return Boolean(data);
 }
 
-// Restaura uma sessão anterior sem bloquear o formulário de login.
-(async () => {
-    try {
-        const { data, error } = await withTimeout(
-            supabaseClient.auth.getSession(),
-            10000,
-            "A restauração da sessão demorou mais de 10 segundos."
-        );
-        if (error) throw error;
-        if (data?.session?.user && await verifyAdmin(data.session.user)) {
-            window.location.replace("admin.html");
-        }
-    } catch (error) {
-        console.warn("Não foi possível restaurar a sessão:", error);
-    }
-})();
-
+// Não redireciona automaticamente com uma sessão antiga.
+// O acesso ao painel só acontece após um login explícito pelo formulário.
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
