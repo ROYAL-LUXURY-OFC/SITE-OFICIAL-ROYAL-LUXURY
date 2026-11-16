@@ -64,26 +64,34 @@ function withTimeout(promise, milliseconds = 12000) {
 }
 
 async function verifyAdmin() {
-    const { data: sessionData, error: sessionError } =
-        await withTimeout(supabaseClient.auth.getSession());
+    const { data: userData, error: userError } = await withTimeout(
+        supabaseClient.auth.getUser(),
+        10000
+    );
 
-    if (sessionError) throw sessionError;
-    if (!sessionData.session) return false;
+    if (userError) throw userError;
+    const user = userData?.user;
+    if (!user) return false;
 
-    // A função SECURITY DEFINER verifica auth.uid() na tabela admins_rlx.
+    // Consulta somente o registro do próprio usuário. A tabela admins_rlx
+    // deve permitir que cada administrador leia a própria linha.
     const { data, error } = await withTimeout(
-        supabaseClient.rpc("is_admin_rlx")
+        supabaseClient
+            .from("admins_rlx")
+            .select("user_id")
+            .eq("user_id", user.id)
+            .maybeSingle(),
+        10000
     );
 
     if (error) throw error;
 
-    if (data !== true) {
+    if (!data) {
         await supabaseClient.auth.signOut();
         return false;
     }
 
     return true;
-}
 
 // LOGIN
 loginForm.addEventListener("submit", async (event) => {
