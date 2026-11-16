@@ -59,7 +59,7 @@ loginForm.addEventListener("submit", async (event) => {
         window.location.replace("admin.html");
     } catch (error) {
         console.error("Falha no login:", error);
-        showMessage("A verificação falhou ou demorou demais. Tente novamente.", true);
+        showMessage("Falha na verificação: " + (error?.message || String(error)), true);
     } finally {
         submit.disabled = false;
     }
