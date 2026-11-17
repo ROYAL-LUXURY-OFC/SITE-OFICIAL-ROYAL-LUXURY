@@ -93,7 +93,7 @@ async function loadPublicLines() {
     const box = document.querySelector("#lines .container");
     if (!box) return;
     const { data, error } = await rlxSupabase.from("lines_rlx")
-        .select("id,nome,sigla,capitao_nick,descricao")
+        .select("id,nome,sigla,capitao_nick,descricao,capa_url")
         .eq("ativo", true).order("nome");
     if (error) {
         console.error("Falha ao carregar lines RLX:", error);
@@ -113,6 +113,7 @@ async function loadPublicLines() {
     }
     grid.innerHTML = data.map(line => `
         <article class="info-card line-card">
+            ${line.capa_url ? `<div class="line-cover"><img src="${safeText(line.capa_url)}" alt="Capa da line ${safeText(line.nome)}" loading="lazy"></div>` : ""}
             <span class="card-kicker">${safeText(line.sigla || "RLX")}</span>
             <h3>${safeText(line.nome)}</h3>
             <p><strong>Capitão:</strong> ${safeText(line.capitao_nick || "A definir")}</p>
