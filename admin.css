@@ -616,3 +616,55 @@ input:focus, select:focus, textarea:focus {
 @media (max-width: 700px) {
     .cleanup-applications-button { width: 100%; }
 }
+
+
+/* CAPA E CAPITÃO DAS LINES */
+.line-field-label {
+    display: block;
+    margin: 12px 0 7px;
+    color: var(--gold-light);
+    font-size: 12px;
+    font-weight: 700;
+}
+.line-upload-hint {
+    display: block;
+    margin-top: 7px;
+    color: var(--gray);
+    font-size: 11px;
+}
+#lineCover {
+    padding: 10px;
+    font-size: 12px;
+}
+.line-cover-preview {
+    position: relative;
+    max-width: 360px;
+    margin-top: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+.line-cover-preview[hidden] { display: none; }
+.line-cover-preview img {
+    display: block;
+    width: 100%;
+    max-height: 180px;
+    object-fit: cover;
+}
+.line-cover-preview span {
+    display: block;
+    padding: 7px 10px;
+    color: var(--gold-light);
+    background: #111;
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+.line-card-cover {
+    display: block;
+    width: 100%;
+    max-height: 190px;
+    margin-bottom: 14px;
+    object-fit: cover;
+    border-radius: 7px;
+}
+.line-data-card { overflow: hidden; }
