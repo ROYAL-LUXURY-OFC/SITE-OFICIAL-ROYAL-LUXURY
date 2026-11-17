@@ -113,7 +113,7 @@ async function loadPublicLines() {
     }
     grid.innerHTML = data.map(line => `
         <article class="info-card line-card">
-            ${line.capa_url ? `<div class="line-cover"><img src="${safeText(line.capa_url)}" alt="Capa da line ${safeText(line.nome)}" loading="lazy"></div>` : ""}
+            ${line.capa_url ? `<div class="line-cover" style="width:110px!important;max-width:110px!important;height:62px!important;max-height:62px!important;overflow:hidden;flex:0 0 110px"><img src="${safeText(line.capa_url)}" alt="Capa da line ${safeText(line.nome)}" loading="lazy" style="display:block;width:100%;height:100%;object-fit:cover"></div>` : ""}
             <span class="card-kicker">${safeText(line.sigla || "RLX")}</span>
             <h3>${safeText(line.nome)}</h3>
             <p><strong>Capitão:</strong> ${safeText(line.capitao_nick || "A definir")}</p>
