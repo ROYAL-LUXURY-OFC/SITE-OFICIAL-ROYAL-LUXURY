@@ -933,12 +933,14 @@ body::before {
 }
 .line-card { border-top-width: 3px; overflow: hidden; }
 .line-cover {
-    width: calc(100% + 48px);
-    aspect-ratio: 16 / 9;
-    margin: -24px -24px 20px;
+    width: 100%;
+    max-height: 125px;
+    aspect-ratio: 16 / 6;
+    margin: 0 0 16px;
     overflow: hidden;
+    border: 1px solid rgba(198,164,92,.28);
+    border-radius: 9px;
     background: linear-gradient(135deg, #211b10, #090909);
-    border-bottom: 1px solid rgba(198,164,92,.28);
 }
 .line-cover img {
     display: block;
@@ -947,7 +949,7 @@ body::before {
     object-fit: cover;
 }
 @media (max-width: 600px) {
-    .line-cover { width: calc(100% + 36px); margin: -18px -18px 18px; }
+    .line-cover { max-height: 105px; margin-bottom: 14px; }
 }
 .results-grid .info-card { border-top-color: #d4b46c; }
 .championships-grid .info-card { background: linear-gradient(145deg, #1c1911, #0e0e0e); }
