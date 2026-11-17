@@ -143,8 +143,16 @@
 
                 <form id="lineForm" class="admin-form">
                     <input type="hidden" id="lineId">
+                    <input type="hidden" id="lineCoverUrl">
                     <input id="lineName" placeholder="Nome da line" required>
-                    <input id="lineLeader" placeholder="Capitão da line">
+                    <label class="line-field-label" for="lineLeader">Capitão da line</label>
+                    <select id="lineLeader" required>
+                        <option value="">Carregando membros...</option>
+                    </select>
+                    <label class="line-field-label" for="lineCover">Foto de capa da line</label>
+                    <input id="lineCover" type="file" accept="image/png,image/jpeg,image/webp">
+                    <small class="line-upload-hint">Imagem JPG, PNG ou WEBP. Limite de 5 MB.</small>
+                    <div id="lineCoverPreview" class="line-cover-preview" hidden></div>
                     <textarea id="lineDescription" placeholder="Descrição da line"></textarea>
                     <button type="submit">SALVAR LINE</button>
                 </form>
@@ -231,6 +239,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="admin-20261116.js?v=1"></script>
+    <script src="admin-20261117.js?v=1"></script>
 </body>
 </html>
