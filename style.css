@@ -933,11 +933,12 @@ body::before {
 }
 .line-card { border-top-width: 3px; overflow: hidden; }
 .line-cover {
-    width: 120px;
-    height: 68px;
+    width: 80px;
+    height: 45px;
     max-height: none;
     aspect-ratio: 16 / 9;
-    margin: 0 0 12px;
+    margin: 0 0 10px;
+    flex: 0 0 80px;
     overflow: hidden;
     border: 1px solid rgba(198,164,92,.28);
     border-radius: 8px;
